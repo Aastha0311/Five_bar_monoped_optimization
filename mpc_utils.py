@@ -1,5 +1,5 @@
 import numpy as np
-from qpsolvers import solve_qp
+from qpsolvers import solve_qp as qp
 
 def generate_reference_trajectory(initial_state, desired_velocity, desired_ang_vel, time_horizon, dt):
     """
@@ -143,29 +143,50 @@ def get_force_constraints(friction_coeff, mass, time_horizon):
 
     return c, C
 
-def solve_qp(x_init, x_ref, A_lifted, B_lifted, force_contraints):
+def solve_qp(x_init, x_ref, A_lifted, B_lifted, force_contraints, Q_state=None, R_input=None):
     """
     Solves the quadratic programming problem for MPC.
 
     Parameters:
     - x_init: np.array, initial state
-    - x_ref: np.array, reference trajectory
+    - x_ref: np.array, reference trajectory (flattened for all time steps)
     - A_lifted: np.array, lifted state transition matrix
     - B_lifted: np.array, lifted control input matrix
+    - force_contraints: tuple, (c, C) inequality constraints
+    - Q_state: np.array, state deviation weight matrix (n_states x n_states), defaults to identity
+    - R_input: np.array, control effort weight matrix (n_inputs x n_inputs), defaults to identity
 
     Returns:
     - u_optimal: np.array, optimal control inputs
     """
-    L = np.eye(A_lifted.shape[1])  # State deviation weight 
-    K = np.eye(B_lifted.shape[1])  # Control effort weight
-    
-    # Cost function
-    H = 2*(B_lifted.T@L@B_lifted + K)
-    g = 2*B_lifted.T@L@(A_lifted@x_init - x_ref)
-    
+    n_states_total = A_lifted.shape[0]  # n_states * N
+    n_inputs_total = B_lifted.shape[1]  # n_inputs * N
+
+    # Determine dimensions
+    n_states = A_lifted.shape[1]  # Single time step state dimension
+    n_inputs = n_inputs_total // (n_states_total // n_states)  # Single time step input dimension
+    N = n_states_total // n_states  # Time horizon steps
+
+    # Default weights if not provided
+    if Q_state is None:
+        Q_state = np.eye(n_states)
+    if R_input is None:
+        R_input = np.eye(n_inputs)
+
+    # Build block-diagonal L matrix for state deviation weights over horizon
+    L = np.kron(np.eye(N), Q_state)
+
+    # Build block-diagonal K matrix for control effort weights over horizon
+    K = np.kron(np.eye(N), R_input)
+
+    # Cost function: minimize (x - x_ref)^T L (x - x_ref) + u^T K u
+    # where x = A_lifted @ x_init + B_lifted @ u
+    H = 2*(B_lifted.T @ L @ B_lifted + K)
+    g = 2*B_lifted.T @ L @ (A_lifted @ x_init - x_ref.flatten())
+
     # Inequality constraints
     c, C = force_contraints
-    
-    res = solve_qp(H, g, C, c, solver="clarabel", verbose=False)
+
+    res = qp(H, g, C, c, solver="clarabel", verbose=False)
 
     return res
