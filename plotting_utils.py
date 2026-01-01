@@ -52,7 +52,7 @@ def calculate_joint_torques(foot_force, com_pos, foot_pos, L_thigh, L_shank):
     Calculate joint torques using inverse dynamics (simplified).
 
     Args:
-        foot_force: [Fx, Fy] - force at foot
+        foot_force: [Fx, Fy] - force at foot in WORLD frame
         com_pos: [x, y, theta] - COM position
         foot_pos: [x, y] - foot position in world frame
         L_thigh: thigh length
@@ -72,16 +72,22 @@ def calculate_joint_torques(foot_force, com_pos, foot_pos, L_thigh, L_shank):
     dx_body = dx * np.cos(-theta) - dy * np.sin(-theta)
     dy_body = dx * np.sin(-theta) + dy * np.cos(-theta)
 
+    # Transform forces from world frame to body frame
+    Fx_world = foot_force[0]
+    Fy_world = foot_force[1]
+    Fx_body = Fx_world * np.cos(-theta) - Fy_world * np.sin(-theta)
+    Fy_body = Fx_world * np.sin(-theta) + Fy_world * np.cos(-theta)
+
     # Calculate knee position in body frame
     knee_x = L_thigh * np.sin(hip_angle)
     knee_y = -L_thigh * np.cos(hip_angle)
 
-    # Torques from external forces
+    # Torques from external forces (now using body frame forces)
     # Hip torque = r_foot × F
-    hip_torque = dx_body * foot_force[1] - dy_body * foot_force[0]
+    hip_torque = dx_body * Fy_body - dy_body * Fx_body
 
     # Knee torque = r_foot_from_knee × F
-    knee_torque = (dx_body - knee_x) * foot_force[1] - (dy_body - knee_y) * foot_force[0]
+    knee_torque = (dx_body - knee_x) * Fy_body - (dy_body - knee_y) * Fx_body
 
     return hip_torque, knee_torque
 
@@ -310,6 +316,9 @@ def plot_simulation_results(time_data, state_data, foot_pos_data, foot_force_dat
     print(f"  Right Knee: {np.min(right_knee_angles):.1f}° to {np.max(right_knee_angles):.1f}°")
     print(f"  Left Hip: {np.min(left_hip_angles):.1f}° to {np.max(left_hip_angles):.1f}°")
     print(f"  Left Knee: {np.min(left_knee_angles):.1f}° to {np.max(left_knee_angles):.1f}°")
+    print(f"\nForce Ranges:")
+    print(f"  Right Foot: Fx=[{np.min(foot_force_data[:, 0]):.2f}, {np.max(foot_force_data[:, 0]):.2f}] N, Fy=[{np.min(foot_force_data[:, 1]):.2f}, {np.max(foot_force_data[:, 1]):.2f}] N")
+    print(f"  Left Foot:  Fx=[{np.min(foot_force_data[:, 2]):.2f}, {np.max(foot_force_data[:, 2]):.2f}] N, Fy=[{np.min(foot_force_data[:, 3]):.2f}, {np.max(foot_force_data[:, 3]):.2f}] N")
     print(f"\nTorque Ranges:")
     print(f"  Right Hip: {np.min(right_hip_torques):.2f} to {np.max(right_hip_torques):.2f} Nm")
     print(f"  Right Knee: {np.min(right_knee_torques):.2f} to {np.max(right_knee_torques):.2f} Nm")
