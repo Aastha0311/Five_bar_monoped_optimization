@@ -164,8 +164,8 @@ class Simulator:
         self.state = np.array([0, robot.nominal_com_height, 0, 0, 0, 0, -GRAVITY])
 
         # Feet on ground with narrow stance to stay within leg reach
-        stance_width = 0.15
-        self.foot_pos_world_frame = np.array([-stance_width, robot.ground_level, stance_width, robot.ground_level])
+        stance_width = 0.05
+        self.foot_pos_world_frame = np.array([-stance_width, robot.ground_level, -stance_width, robot.ground_level])
 
         # Data recording for plotting
         self.time_history = []
@@ -283,7 +283,7 @@ class Simulator:
 
 if __name__ == "__main__":
     robot = Robot_biped_2D(mass=5.0, moment_of_inertia=0.02, L_thigh=0.2, L_shank=0.2, friction_coeff=0.8)
-    controller = Controller(robot, control_dt=0.1, time_horizon=10, stepping_frequency=0.5)  # Much slower: 0.5 Hz = 2s per step
+    controller = Controller(robot, control_dt=0.1, time_horizon=10, stepping_frequency=2)  # Much slower: 0.5 Hz = 2s per step
     simulator = Simulator(robot, controller, sim_dt=0.1)
 
     desired_velocity = np.array([0.1, 0.0])  # desired forward velocity in x and y (reduced for testing)
