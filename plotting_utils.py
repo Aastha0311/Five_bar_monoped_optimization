@@ -49,7 +49,7 @@ def inverse_kinematics_2D(com_pos, foot_pos, L_thigh, L_shank):
 
 def calculate_joint_torques(foot_force, com_pos, foot_pos, L_thigh, L_shank):
     """
-    Calculate joint torques using inverse dynamics (simplified).
+    Calculate joint torques using Jacobian transpose method: tau = J^T @ F
 
     Args:
         foot_force: [Fx, Fy] - force at foot in WORLD frame
@@ -65,29 +65,32 @@ def calculate_joint_torques(foot_force, com_pos, foot_pos, L_thigh, L_shank):
     # Get joint angles
     hip_angle, knee_angle = inverse_kinematics_2D(com_pos, foot_pos, L_thigh, L_shank)
 
-    # Transform foot position to body frame
-    dx = foot_pos[0] - com_pos[0]
-    dy = foot_pos[1] - com_pos[1]
-    theta = com_pos[2]
-    dx_body = dx * np.cos(-theta) - dy * np.sin(-theta)
-    dy_body = dx * np.sin(-theta) + dy * np.cos(-theta)
-
     # Transform forces from world frame to body frame
+    theta = com_pos[2]
     Fx_world = foot_force[0]
     Fy_world = foot_force[1]
     Fx_body = Fx_world * np.cos(-theta) - Fy_world * np.sin(-theta)
     Fy_body = Fx_world * np.sin(-theta) + Fy_world * np.cos(-theta)
 
-    # Calculate knee position in body frame
-    knee_x = L_thigh * np.sin(hip_angle)
-    knee_y = -L_thigh * np.cos(hip_angle)
+    # Calculate Jacobian: J maps joint velocities to foot velocities
+    # foot_vel = J @ [hip_dot, knee_dot]
+    # For 2D leg:
+    # foot_x = L_thigh * sin(hip) + L_shank * sin(hip + knee)
+    # foot_y = -L_thigh * cos(hip) - L_shank * cos(hip + knee)
 
-    # Torques from external forces (now using body frame forces)
-    # Hip torque = r_foot × F
-    hip_torque = dx_body * Fy_body - dy_body * Fx_body
+    # Jacobian derivatives:
+    J = np.zeros((2, 2))
+    J[0, 0] = L_thigh * np.cos(hip_angle) + L_shank * np.cos(hip_angle + knee_angle)  # dx/d(hip)
+    J[0, 1] = L_shank * np.cos(hip_angle + knee_angle)  # dx/d(knee)
+    J[1, 0] = L_thigh * np.sin(hip_angle) + L_shank * np.sin(hip_angle + knee_angle)  # dy/d(hip)
+    J[1, 1] = L_shank * np.sin(hip_angle + knee_angle)  # dy/d(knee)
 
-    # Knee torque = r_foot_from_knee × F
-    knee_torque = (dx_body - knee_x) * Fy_body - (dy_body - knee_y) * Fx_body
+    # Calculate torques: tau = J^T @ F
+    F_body = np.array([Fx_body, Fy_body])
+    torques = J.T @ F_body
+
+    hip_torque = torques[0]
+    knee_torque = torques[1]
 
     return hip_torque, knee_torque
 
