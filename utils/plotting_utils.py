@@ -2,101 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def inverse_kinematics_2D(com_pos, foot_pos, L_thigh, L_shank):
-    """
-    Calculate joint angles (hip and knee) for a 2D leg.
-
-    Args:
-        com_pos: [x, y, theta] - COM position and orientation
-        foot_pos: [x, y] - foot position in world frame
-        L_thigh: length of thigh
-        L_shank: length of shank
-
-    Returns:
-        hip_angle: angle of thigh relative to vertical (radians)
-        knee_angle: angle of knee joint (radians)
-    """
-    # Transform foot position to body frame
-    dx = foot_pos[0] - com_pos[0]
-    dy = foot_pos[1] - com_pos[1]
-
-    # Rotate by body angle to get position in body frame
-    theta = com_pos[2]
-    dx_body = dx * np.cos(-theta) - dy * np.sin(-theta)
-    dy_body = dx * np.sin(-theta) + dy * np.cos(-theta)
-
-    # Distance to foot
-    r = np.sqrt(dx_body**2 + dy_body**2)
-
-    # Check if position is reachable
-    if r > (L_thigh + L_shank):
-        r = L_thigh + L_shank - 0.001  # Slightly less than max reach
-    if r < abs(L_thigh - L_shank):
-        r = abs(L_thigh - L_shank) + 0.001
-
-    # Use law of cosines to find knee angle
-    cos_knee = (L_thigh**2 + L_shank**2 - r**2) / (2 * L_thigh * L_shank)
-    cos_knee = np.clip(cos_knee, -1.0, 1.0)
-    knee_angle = np.pi - np.arccos(cos_knee)  # Interior angle
-
-    # Find hip angle
-    alpha = np.arctan2(dx_body, -dy_body)  # Angle to foot from COM
-    beta = np.arccos((L_thigh**2 + r**2 - L_shank**2) / (2 * L_thigh * r))
-    hip_angle = alpha - beta
-
-    return hip_angle, knee_angle
-
-
-def calculate_joint_torques(foot_force, com_pos, foot_pos, L_thigh, L_shank):
-    """
-    Calculate joint torques using Jacobian transpose method: tau = J^T @ F
-
-    Args:
-        foot_force: [Fx, Fy] - force at foot in WORLD frame
-        com_pos: [x, y, theta] - COM position
-        foot_pos: [x, y] - foot position in world frame
-        L_thigh: thigh length
-        L_shank: shank length
-
-    Returns:
-        hip_torque: torque at hip joint
-        knee_torque: torque at knee joint
-    """
-    # Get joint angles
-    hip_angle, knee_angle = inverse_kinematics_2D(com_pos, foot_pos, L_thigh, L_shank)
-
-    # Transform forces from world frame to body frame
-    theta = com_pos[2]
-    Fx_world = foot_force[0]
-    Fy_world = foot_force[1]
-    Fx_body = Fx_world * np.cos(-theta) - Fy_world * np.sin(-theta)
-    Fy_body = Fx_world * np.sin(-theta) + Fy_world * np.cos(-theta)
-
-    # Calculate Jacobian: J maps joint velocities to foot velocities
-    # foot_vel = J @ [hip_dot, knee_dot]
-    # For 2D leg:
-    # foot_x = L_thigh * sin(hip) + L_shank * sin(hip + knee)
-    # foot_y = -L_thigh * cos(hip) - L_shank * cos(hip + knee)
-
-    # Jacobian derivatives:
-    J = np.zeros((2, 2))
-    J[0, 0] = L_thigh * np.cos(hip_angle) + L_shank * np.cos(hip_angle + knee_angle)  # dx/d(hip)
-    J[0, 1] = L_shank * np.cos(hip_angle + knee_angle)  # dx/d(knee)
-    J[1, 0] = L_thigh * np.sin(hip_angle) + L_shank * np.sin(hip_angle + knee_angle)  # dy/d(hip)
-    J[1, 1] = L_shank * np.sin(hip_angle + knee_angle)  # dy/d(knee)
-
-    # Calculate torques: tau = J^T @ F
-    F_body = np.array([Fx_body, Fy_body])
-    torques = J.T @ F_body
-
-    hip_torque = torques[0]
-    knee_torque = torques[1]
-
-    return hip_torque, knee_torque
-
-
 def plot_simulation_results(time_data, state_data, foot_pos_data, foot_force_data,
-                           phase_data, L_thigh, L_shank):
+                           phase_data, joint_angles_data, joint_torques_data):
     """
     Create comprehensive plots of the simulation results.
 
@@ -106,8 +13,8 @@ def plot_simulation_results(time_data, state_data, foot_pos_data, foot_force_dat
         foot_pos_data: list of foot positions [r_x, r_y, l_x, l_y]
         foot_force_data: list of foot forces [Fr_x, Fr_y, Fl_x, Fl_y]
         phase_data: list of phase values (0 to 1)
-        L_thigh: thigh length
-        L_shank: shank length
+        joint_angles_data: list of joint angles [right_hip, right_knee, left_hip, left_knee] in radians
+        joint_torques_data: list of joint torques [right_hip, right_knee, left_hip, left_knee] in Nm
     """
     # Convert lists to numpy arrays
     time_data = np.array(time_data)
@@ -115,51 +22,20 @@ def plot_simulation_results(time_data, state_data, foot_pos_data, foot_force_dat
     foot_pos_data = np.array(foot_pos_data)
     foot_force_data = np.array(foot_force_data)
     phase_data = np.array(phase_data)
+    joint_angles_data = np.array(joint_angles_data)
+    joint_torques_data = np.array(joint_torques_data)
 
-    # Calculate joint angles and torques
-    right_hip_angles = []
-    right_knee_angles = []
-    left_hip_angles = []
-    left_knee_angles = []
-    right_hip_torques = []
-    right_knee_torques = []
-    left_hip_torques = []
-    left_knee_torques = []
+    # Extract joint angles and convert to degrees
+    right_hip_angles = np.rad2deg(joint_angles_data[:, 0])
+    right_knee_angles = np.rad2deg(joint_angles_data[:, 1])
+    left_hip_angles = np.rad2deg(joint_angles_data[:, 2])
+    left_knee_angles = np.rad2deg(joint_angles_data[:, 3])
 
-    for i in range(len(time_data)):
-        com_pos = state_data[i, 0:3]
-        foot_pos_r = foot_pos_data[i, 0:2]
-        foot_pos_l = foot_pos_data[i, 2:4]
-        foot_force_r = foot_force_data[i, 0:2]
-        foot_force_l = foot_force_data[i, 2:4]
-
-        # Right leg angles and torques
-        hip_r, knee_r = inverse_kinematics_2D(com_pos, foot_pos_r, L_thigh, L_shank)
-        right_hip_angles.append(hip_r)
-        right_knee_angles.append(knee_r)
-
-        torque_hip_r, torque_knee_r = calculate_joint_torques(foot_force_r, com_pos, foot_pos_r, L_thigh, L_shank)
-        right_hip_torques.append(torque_hip_r)
-        right_knee_torques.append(torque_knee_r)
-
-        # Left leg angles and torques
-        hip_l, knee_l = inverse_kinematics_2D(com_pos, foot_pos_l, L_thigh, L_shank)
-        left_hip_angles.append(hip_l)
-        left_knee_angles.append(knee_l)
-
-        torque_hip_l, torque_knee_l = calculate_joint_torques(foot_force_l, com_pos, foot_pos_l, L_thigh, L_shank)
-        left_hip_torques.append(torque_hip_l)
-        left_knee_torques.append(torque_knee_l)
-
-    # Convert to arrays and degrees
-    right_hip_angles = np.rad2deg(np.array(right_hip_angles))
-    right_knee_angles = np.rad2deg(np.array(right_knee_angles))
-    left_hip_angles = np.rad2deg(np.array(left_hip_angles))
-    left_knee_angles = np.rad2deg(np.array(left_knee_angles))
-    right_hip_torques = np.array(right_hip_torques)
-    right_knee_torques = np.array(right_knee_torques)
-    left_hip_torques = np.array(left_hip_torques)
-    left_knee_torques = np.array(left_knee_torques)
+    # Extract joint torques
+    right_hip_torques = joint_torques_data[:, 0]
+    right_knee_torques = joint_torques_data[:, 1]
+    left_hip_torques = joint_torques_data[:, 2]
+    left_knee_torques = joint_torques_data[:, 3]
 
     # Create figure with subplots
     fig = plt.figure(figsize=(16, 12))
@@ -222,7 +98,7 @@ def plot_simulation_results(time_data, state_data, foot_pos_data, foot_force_dat
     ax6.set_ylim([0, 1])
     ax6.grid(True, alpha=0.3)
 
-    # 7. Joint Angles
+    # 7. Joint Angles - Hip
     ax7 = plt.subplot(3, 3, 7)
     ax7.plot(time_data, right_hip_angles, 'b-', label='Right Hip', linewidth=1.5)
     ax7.plot(time_data, left_hip_angles, 'r-', label='Left Hip', linewidth=1.5)
@@ -232,7 +108,7 @@ def plot_simulation_results(time_data, state_data, foot_pos_data, foot_force_dat
     ax7.legend()
     ax7.grid(True, alpha=0.3)
 
-    # 8. Knee Angles
+    # 8. Joint Angles - Knee
     ax8 = plt.subplot(3, 3, 8)
     ax8.plot(time_data, right_knee_angles, 'b-', label='Right Knee', linewidth=1.5)
     ax8.plot(time_data, left_knee_angles, 'r-', label='Left Knee', linewidth=1.5)
@@ -255,8 +131,8 @@ def plot_simulation_results(time_data, state_data, foot_pos_data, foot_force_dat
     ax9.grid(True, alpha=0.3)
 
     plt.tight_layout()
-    plt.savefig('simulation_results_main.png', dpi=150, bbox_inches='tight')
-    print("Saved main plots to simulation_results_main.png")
+    plt.savefig('logs/simulation_results_main.png', dpi=150, bbox_inches='tight')
+    print("Saved main plots to logs/simulation_results_main.png")
 
     # Create a second figure for torques
     fig2 = plt.figure(figsize=(14, 8))
@@ -301,8 +177,8 @@ def plot_simulation_results(time_data, state_data, foot_pos_data, foot_force_dat
     ax4.grid(True, alpha=0.3)
 
     plt.tight_layout()
-    plt.savefig('simulation_results_torques.png', dpi=150, bbox_inches='tight')
-    print("Saved torque plots to simulation_results_torques.png")
+    plt.savefig('logs/simulation_results_torques.png', dpi=150, bbox_inches='tight')
+    print("Saved torque plots to logs/simulation_results_torques.png")
 
     plt.show()
 

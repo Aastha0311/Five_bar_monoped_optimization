@@ -1,5 +1,6 @@
 import numpy as np
 from qpsolvers import solve_qp as qp
+from scipy.sparse import csc_matrix
 
 GRAVITY = 9.81  # Avoid circular import
 
@@ -250,9 +251,13 @@ def solve_qp(x_init, x_ref, A_lifted, B_lifted, force_contraints, Q_state=None, 
     # Add regularization to H to ensure positive definiteness and improve conditioning
     H = H + 1e-5 * np.eye(H.shape[0])
 
+    # Convert to sparse matrices for better performance and to avoid warnings
+    H_sparse = csc_matrix(H)
+    C_sparse = csc_matrix(C)
+
     # Try OSQP first with relaxed tolerances for better numerical stability
     try:
-        res = qp(H, g, C, c, solver="osqp", verbose=False,
+        res = qp(H_sparse, g, C_sparse, c, solver="osqp", verbose=False,
                 eps_abs=1e-4, eps_rel=1e-4, max_iter=10000, polish=True)
         if res is not None:
             return res
@@ -264,7 +269,7 @@ def solve_qp(x_init, x_ref, A_lifted, B_lifted, force_contraints, Q_state=None, 
     solvers_to_try = ["clarabel"]
     for solver in solvers_to_try:
         try:
-            res = qp(H, g, C, c, solver=solver, verbose=False)
+            res = qp(H_sparse, g, C_sparse, c, solver=solver, verbose=False)
             if res is not None:
                 return res
         except Exception as e:
