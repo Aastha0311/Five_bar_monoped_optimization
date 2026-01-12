@@ -3,12 +3,12 @@ import utils.mpc_utils as mpc
 from components.robot import GRAVITY, Robot_biped_2D
 
 class Controller:
-    def __init__(self, robot: Robot_biped_2D, time_horizon, stepping_frequency, control_dt):
+    def __init__(self, robot: Robot_biped_2D, time_horizon, stepping_frequency, control_dt, raibert_gain):
         self.robot = robot
         self.time_horizon = time_horizon
         self.control_dt = control_dt
         self.stepping_frequency = stepping_frequency 
-        self.Kp = 0.15
+        self.Kp = raibert_gain
         self.swing_height = 0.1
 
     def stand(self, state, foot_pos_world_frame, desired_height):

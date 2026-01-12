@@ -7,7 +7,7 @@ from components.controller import Controller
 
 if __name__ == "__main__":
     robot = Robot_biped_2D(mass=5.0, moment_of_inertia=0.02, L_thigh=0.2, L_shank=0.2, friction_coeff=0.8, density=500)
-    controller = Controller(robot, control_dt=0.1, time_horizon=10, stepping_frequency=2) 
+    controller = Controller(robot, control_dt=0.1, time_horizon=10, stepping_frequency=2, raibert_gain=0.08) 
     simulator = Simulator(robot, controller, sim_dt=0.1, visualize=True)
 
     desired_velocity = np.array([0.1, 0.0])  # desired forward velocity in x and y (reduced for testing)
