@@ -10,6 +10,7 @@ class Controller:
         self.stepping_frequency = stepping_frequency 
         self.Kp = raibert_gain
         self.swing_height = 0.1
+        #just a placeholder for now
 
     def stand(self, state, foot_pos_world_frame, desired_height):
         g = GRAVITY
