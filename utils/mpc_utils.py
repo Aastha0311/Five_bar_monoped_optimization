@@ -240,7 +240,7 @@ def solve_qp(x_init, x_ref, A_lifted, B_lifted, force_contraints, Q_state=None, 
     K = np.block([[decay_weights[i] * R_input if i == j else np.zeros((n_inputs, n_inputs))
                    for j in range(N)] for i in range(N)])
 
-    # Cost function: minimize (x - x_ref)^T L (x - x_ref) + u^T K u
+    # Cost function: minimize (x - x_ref)^T H (x - x_ref) + u^T g u
     # where x = A_lifted @ x_init + B_lifted @ u
     H = 2*(B_lifted.T @ L @ B_lifted + K)
     g = 2*B_lifted.T @ L @ (A_lifted @ x_init - x_ref.flatten())

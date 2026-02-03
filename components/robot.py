@@ -57,7 +57,7 @@ class Robot_biped_2D:
         I = self.moment_of_inertia
 
         p_c_x = com_pos[0]
-        p_c_y = com_pos[1]
+        p_c_y = com_pos[1] 
 
         p_r_x = foot_pos_world_frame[0]
         p_r_y = foot_pos_world_frame[1]
@@ -178,7 +178,7 @@ class Robot_biped_2D:
         # Perpendicular distance is the horizontal component (since gravity is vertical)
         tau_hip_shank = self.m_shank * g * shank_com_x
 
-        hip_torque_gravity = tau_hip_thigh + tau_hip_shank
+        hip_torque_gravity = tau_hip_thigh + (1*tau_hip_shank)
 
         # Knee torque from gravity
         # Only the shank contributes torque about the knee
