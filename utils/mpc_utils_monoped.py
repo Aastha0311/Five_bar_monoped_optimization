@@ -67,7 +67,8 @@ def get_lifted_dynamics_matrices(A, B, time_horizon, dt):
     A_power = Ad.copy()
     for i in range(N):
         A_lifted[i*n_states:(i+1)*n_states, :] = A_power
-        A_power = A_power @ Ad
+        if i < N - 1:
+            A_power = A_power @ Ad
 
     A_power = np.eye(n_states)
     for i in range(N):
@@ -104,6 +105,7 @@ def get_force_constraints(friction_coeff, mass, time_horizon):
 
     C = np.zeros((n_constraints, n_forces * N))
     c = np.zeros(n_constraints)
+    max_vertical_force = 1.5 * mass * g
 
     row = 0
     for t in range(N):
@@ -163,10 +165,10 @@ def solve_qp(x_init,
         Q_diag = np.zeros(n_states)
         Q_diag[0] = 2.0    # x
         Q_diag[1] = 20.0   # y
-        Q_diag[2] = 10.0   # theta
+        Q_diag[2] = 200  # theta
         Q_diag[3] = 5.0    # xdot
         Q_diag[4] = 5.0    # ydot
-        Q_diag[5] = 5.0    # thetadot
+        Q_diag[5] = 50.0    # thetadot
         Q_diag[6] = 0.0    # gravity
         Q_state = np.diag(Q_diag)
 

@@ -86,6 +86,16 @@ class Controller:
 
             # Only first control input is applied
             foot_force = optimal_force[:2]
+            # Vertical stabilization
+            foot_force[1] += 200.0 * (self.robot.nominal_com_height - init_state[1])
+            foot_force[1] += -20.0 * init_state[4]
+
+            # Angular damping
+            foot_force[0] -= 5.0 * init_state[5]
+
+            # Friction-like clamp
+            #foot_force[0] = np.clip(foot_force[0], -0.3 * foot_force[1], 0.3 * foot_force[1])
+
             optimal_foot_pos = foot_pos_world_frame
 
         # ===============================

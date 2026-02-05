@@ -1,0 +1,146 @@
+# mujoco_env.py
+# import mujoco
+# import mujoco.viewer
+# import numpy as np
+
+# class MuJoCoMonopedEnv:
+#     def __init__(self, xml_path, dt=0.001, render=True):
+#         self.model = mujoco.MjModel.from_xml_path(xml_path)
+#         self.data = mujoco.MjData(self.model)
+#         self.model.opt.timestep = dt
+
+#         self.render = render
+#         self.viewer = None
+#         if render:
+#             self.viewer = mujoco.viewer.launch_passive(self.model, self.data)
+
+#         # Cache indices
+#         self.joint_ids = {
+#             "hip": mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_JOINT, "hinge1"),
+#             "knee": mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_JOINT, "hinge2"),
+#         }
+
+#         self.act_ids = {
+#             "hip": mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_ACTUATOR, "torque1"),
+#             "knee": mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_ACTUATOR, "torque2"),
+#         }
+
+#         self.body_ids = {
+#             "base": mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY, "base"),
+#             "foot": mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY, "link2"),
+#         }
+
+#     def reset(self):
+#         mujoco.mj_resetData(self.model, self.data)
+
+#     def step(self, torques):
+#         """
+#         torques = np.array([hip_tau, knee_tau])
+#         """
+#         self.data.ctrl[self.act_ids["hip"]] = torques[0]
+#         self.data.ctrl[self.act_ids["knee"]] = torques[1]
+
+#         mujoco.mj_step(self.model, self.data)
+
+#         if self.viewer:
+#             self.viewer.sync()
+
+#     def get_state(self):
+#         """
+#         Returns centroidal state for MPC
+#         """
+#         com = self.data.subtree_com[self.body_ids["base"]]
+#         com_vel = self.data.subtree_linvel[self.body_ids["base"]]
+
+#         theta = self.data.qpos[self.joint_ids["hip"]]
+#         theta_dot = self.data.qvel[self.joint_ids["hip"]]
+
+#         return {
+#             "com_pos": com.copy(),
+#             "com_vel": com_vel.copy(),
+#             "theta": theta,
+#             "theta_dot": theta_dot,
+#             "qpos": self.data.qpos.copy(),
+#             "qvel": self.data.qvel.copy()
+#         }
+
+#     def foot_in_contact(self):
+#         for i in range(self.data.ncon):
+#             contact = self.data.contact[i]
+#             if contact.geom1 == mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_GEOM, "foot"):
+#                 return True
+#             if contact.geom2 == mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_GEOM, "foot"):
+#                 return True
+#         return False
+
+
+import mujoco
+import numpy as np
+
+class MuJoCoMonopedEnv:
+    def __init__(self, xml_path):
+        self.model = mujoco.MjModel.from_xml_path(xml_path)
+        self.data = mujoco.MjData(self.model)
+
+        # Cache joint indices
+        self.idx_x = self.model.joint('slide_x').qposadr
+        self.idx_z = self.model.joint('slide_z').qposadr
+        self.idx_theta = self.model.joint('hinge_y').qposadr
+
+        self.idx_xd = self.model.joint('slide_x').dofadr
+        self.idx_zd = self.model.joint('slide_z').dofadr
+        self.idx_thetad = self.model.joint('hinge_y').dofadr
+
+        self.hip_id = self.model.joint('hip').dofadr
+        self.knee_id = self.model.joint('knee').dofadr
+
+        self.foot_geom = self.model.geom('foot').id
+
+    # -------------------------------------------------
+    # State extraction (for MPC)
+    # -------------------------------------------------
+    def get_state(self):
+        qpos = self.data.qpos
+        qvel = self.data.qvel
+
+        x = qpos[self.idx_x]
+        z = qpos[self.idx_z]
+        theta = qpos[self.idx_theta]
+
+        xd = qvel[self.idx_xd]
+        zd = qvel[self.idx_zd]
+        thetad = qvel[self.idx_thetad]
+
+        return np.array([x, z, theta, xd, zd, thetad, -9.81])
+
+    # -------------------------------------------------
+    # Foot position (world frame)
+    # -------------------------------------------------
+    def get_foot_position(self):
+        return self.data.geom_xpos[self.foot_geom][[0, 2]]
+
+    # -------------------------------------------------
+    # Contact detection
+    # -------------------------------------------------
+    def in_stance(self):
+        for i in range(self.data.ncon):
+            c = self.data.contact[i]
+            if c.geom2 == self.foot_geom or c.geom1 == self.foot_geom:
+                return True
+        return False
+
+    # -------------------------------------------------
+    # Apply desired foot force via Jᵀ
+    # -------------------------------------------------
+    def apply_foot_force(self, f_world):
+        J = np.zeros((2, self.model.nv))
+        mujoco.mj_jacGeom(self.model, self.data, J, None, self.foot_geom)
+
+        tau = J.T @ f_world
+        self.data.ctrl[self.hip_id] = tau[self.hip_id]
+        self.data.ctrl[self.knee_id] = tau[self.knee_id]
+
+    # -------------------------------------------------
+    def step(self, n=1):
+        for _ in range(n):
+            mujoco.mj_step(self.model, self.data)

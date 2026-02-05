@@ -64,14 +64,22 @@ class Robot_monoped_2D:
             [0, 0],
             [m_inv * in_stance, 0],
             [0, m_inv * in_stance],
-            [-(p_f_y - p_c_y) / I * in_stance,
-              (p_f_x - p_c_x) / I * in_stance],
+            [(-(p_f_y - p_c_y) / I) * in_stance,
+              ((p_f_x - p_c_x) / I) * in_stance],
             [0, 0]
         ])
 
     # -------------------------------------------------
     # Discrete-time LTI step (exact discretization)
     # -------------------------------------------------
+
+    def dynamics(self, X, u, com_pos, foot_pos_world_frame):
+        A = self.A_hat()
+        B = self.B_hat(com_pos=com_pos, foot_pos_world_frame=foot_pos_world_frame)
+        X_dot = np.dot(A,X) + np.dot(B,u)
+
+        return X_dot
+    
     def step_lti(self, X, u, com_pos, foot_pos_world_frame, in_stance, dt):
         A = self.A_hat()
         B = self.B_hat(com_pos, foot_pos_world_frame, in_stance)
