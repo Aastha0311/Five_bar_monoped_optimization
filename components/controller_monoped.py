@@ -16,7 +16,7 @@ class Controller:
         self.stepping_frequency = stepping_frequency
         self.Kp = raibert_gain
 
-        self.swing_height = 0.1  # flight apex clearance
+        self.swing_height = 0.03  # flight apex clearance
 
     # -------------------------------------------------
     # Standing controller (single foot)
@@ -26,7 +26,10 @@ class Controller:
         weight = self.robot.mass * g
 
         # Simple PD on height via vertical GRF
-        Fy = weight + 0.3 * (desired_height - state[1])
+        kp_z = 50.0
+        kd_z = 10.0
+        Fy = weight + kp_z * (desired_height - state[1]) + kd_z * (0.0 - state[4])
+        Fy = np.clip(Fy, 0.0, 1.5 * weight)
         Fx = 0.0
 
         foot_force = np.array([Fx, Fy])
@@ -86,12 +89,26 @@ class Controller:
 
             # Only first control input is applied
             foot_force = optimal_force[:2]
-            # Vertical stabilization
-            foot_force[1] += 200.0 * (self.robot.nominal_com_height - init_state[1])
-            foot_force[1] += -20.0 * init_state[4]
+            # Horizontal damping to reduce x-velocity oscillations
+            foot_force[0] -= 4.0 * init_state[3]
+            foot_force[0] += 6.0 * (desired_velocity[0] - init_state[3])
+            # Vertical stabilization to reduce excessive flight
+            foot_force[1] += 25.0 * (self.robot.nominal_com_height - init_state[1])
+            foot_force[1] += -6.0 * init_state[4]
+            # Clamp within friction limits
+            max_fy = 1.5 * self.robot.mass * GRAVITY
+            foot_force[1] = np.clip(foot_force[1], 0.0, max_fy)
+            foot_force[0] = np.clip(
+                foot_force[0],
+                -self.robot.friction_coeff * foot_force[1],
+                self.robot.friction_coeff * foot_force[1]
+            )
+            # # Vertical stabilization
+            # foot_force[1] += 200.0 * (self.robot.nominal_com_height - init_state[1])
+            # foot_force[1] += -20.0 * init_state[4]
 
-            # Angular damping
-            foot_force[0] -= 5.0 * init_state[5]
+            # # Angular damping
+            # foot_force[0] -= 5.0 * init_state[5]
 
             # Friction-like clamp
             #foot_force[0] = np.clip(foot_force[0], -0.3 * foot_force[1], 0.3 * foot_force[1])
@@ -111,12 +128,12 @@ class Controller:
                 + 0.5 * init_state[3] * T
             )
 
-            raibert_correction = -self.Kp * (desired_velocity[0] - init_state[3])
-            expected_foot_x += raibert_correction
+            raibert_correction = self.Kp * (desired_velocity[0] - init_state[3])
+            expected_foot_x -= raibert_correction
 
             optimal_foot_pos = np.array([
                 expected_foot_x,
-                self.robot.ground_level
+                self.robot.ground_level + self.swing_height
             ])
 
         return foot_force, optimal_foot_pos

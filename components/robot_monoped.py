@@ -5,13 +5,15 @@ GRAVITY = 9.81
 
 
 class Robot_monoped_2D:
-    def __init__(self, mass, moment_of_inertia, L_thigh, L_shank, friction_coeff, density):
+    def __init__(self, mass, moment_of_inertia, L_thigh, L_shank, friction_coeff, density, m_thigh, m_shank):
         self.mass = mass
         self.moment_of_inertia = moment_of_inertia
         self.L_thigh = L_thigh
         self.L_shank = L_shank
         self.friction_coeff = friction_coeff
         self.density = density
+        self.m_thigh = m_thigh
+        self.m_shank = m_shank
 
         # Leg geometry
         self.leg_length = L_thigh + L_shank
@@ -22,8 +24,8 @@ class Robot_monoped_2D:
         leg_mass_fraction = 0.25  # single leg ~25% total mass
         leg_mass = self.mass * leg_mass_fraction
 
-        self.m_thigh = leg_mass * (L_thigh / self.leg_length)
-        self.m_shank = leg_mass * (L_shank / self.leg_length)
+        self.m_thigh = m_thigh
+        self.m_shank = m_shank
 
         # State
         # X = [x, y, theta, xdot, ydot, thetadot, g]
@@ -84,7 +86,7 @@ class Robot_monoped_2D:
         A = self.A_hat()
         B = self.B_hat(com_pos, foot_pos_world_frame, in_stance)
 
-        n, m = A.shape[0], B.shape[1]
+        n, m = A.shape[0], B.shape[1] #n = number of states, m = number of inputs
         M = np.zeros((n + m, n + m))
         M[:n, :n] = A
         M[:n, n:] = B

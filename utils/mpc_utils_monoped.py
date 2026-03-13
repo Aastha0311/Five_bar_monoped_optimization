@@ -165,9 +165,9 @@ def solve_qp(x_init,
         Q_diag = np.zeros(n_states)
         Q_diag[0] = 2.0    # x
         Q_diag[1] = 20.0   # y
-        Q_diag[2] = 200  # theta
-        Q_diag[3] = 5.0    # xdot
-        Q_diag[4] = 5.0    # ydot
+        Q_diag[2] = 20 # theta
+        Q_diag[3] = 5000.0    # xdot
+        Q_diag[4] = 0.0    # ydot
         Q_diag[5] = 50.0    # thetadot
         Q_diag[6] = 0.0    # gravity
         Q_state = np.diag(Q_diag)

@@ -1,0 +1,46 @@
+=================================================
+BEST CMA-ES RESULT (Minimum best_cost)
+=================================================
+
+Thigh               0.240497
+Calf                0.301321
+Hip left motor        VT8020
+Hip right motor    MAD_M6C12
+Hip left ratio      4.327386
+Hip right ratio     4.151655
+Gearbox left             CPG
+Gearbox right            CPG
+Torso distance      0.082022
+Push duration       0.050196
+ best_index                6
+ best_cost          0.539245
+ v2_c1                 272.1
+v2_c2                    4.8
+v2_c3                   20.8
+v4_c1                  153.9
+v4_c2                    9.0
+v4_c3                   49.5
+v6_c1                  186.7
+v6_c2                    4.2
+v6_c3                   46.4
+
+-------------------------------------------------
+Matched actuator configuration
+-------------------------------------------------
+thigh     : 0.2404972314438115
+calf      : 0.3013214740781059
+-------------------------------------------------
+Performance Metrics (v2_actual → v6_energy)
+-------------------------------------------------
+
+Match 1591
+v2_actual: 6.593503792282863
+v2_error: 0.1015701734407945
+v2_energy: 1.3901036583752535
+v4_actual: 7.308505352894865
+v4_error: 0.0724414343539559
+v4_energy: 1.192159063675051
+v6_actual: 8.877232571348383
+v6_error: 0.1666145821571428
+v6_energy: 1.3901036583753337
+

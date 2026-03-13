@@ -1,0 +1,70 @@
+<mujoco model="FiveBar2D">
+
+  <compiler inertiafromgeom="true" angle="radian" />
+  <option timestep="0.001" integrator="implicit" />
+
+  <default>
+    <joint damping="0.1" />
+    <geom contype="1" conaffinity="1" friction="2 0.005 0.0001" />
+  </default>
+
+  <worldbody>
+
+    <geom name="floor" type="plane" size="5 5 0.25" />
+
+    <body name="root" pos="0 0 0.6">
+      <joint name="slide_x" type="slide" axis="1 0 0" />
+      <joint name="slide_z" type="slide" axis="0 0 1" />
+
+      <body name="base">
+
+        <geom name="torso" type="box" size="0.05 0.05 0.1" mass="2.0" />
+
+        
+        <body name="link1_left" pos="0 0 0.05" euler="0 0.7297276562269662 0">
+          <joint name="hip_left" type="hinge" axis="0 -1 0" range="-3.14 3.14" />
+
+          <geom name="thigh_left" type="capsule" fromto="0 0 0 0.35 0 0" size="0.03" mass="1.0" />
+
+          <body name="link2_left" pos="0.35 0 0" euler="0 1.459455312453933 0">
+
+            <joint name="knee_left" type="hinge" axis="0 -1 0" range="-3.14 3.14" />
+
+            <geom name="shank_left" type="capsule" fromto="0 0 0 0.45 0 0" size="0.025" mass="0.5" />
+
+            <site name="left_tip" pos="0.45 0 0" />
+          </body>
+        </body>
+
+        
+        <body name="link1_right" pos="0 0 -0.05" euler="0 0.7297276562269662 0">
+          <joint name="hip_right" type="hinge" axis="0 -1 0" range="-3.14 3.14" />
+
+          <geom name="thigh_right" type="capsule" fromto="0 0 0 0.35 0 0" size="0.03" mass="1.0" />
+
+          <body name="link2_right" pos="0.35 0 0" euler="0 1.459455312453933 0">
+
+            <joint name="knee_right" type="hinge" axis="0 -1 0" range="-3.14 3.14" />
+
+            <geom name="shank_right" type="capsule" fromto="0 0 0 0.45 0 0" size="0.025" mass="0.5" />
+
+            <site name="right_tip" pos="0.45 0 0" />
+          </body>
+        </body>
+
+      </body>
+    </body>
+
+  </worldbody>
+
+  
+  <equality>
+    <connect site1="left_tip" site2="right_tip" solref="0.002 1" solimp="0.9 0.9 0.001" />
+  </equality>
+
+  <actuator>
+    <motor name="torque_left" joint="hip_left" ctrlrange="-60 60" />
+    <motor name="torque_right" joint="hip_right" ctrlrange="-60 60" />
+  </actuator>
+
+</mujoco>

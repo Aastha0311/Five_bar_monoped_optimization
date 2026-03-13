@@ -1,6 +1,6 @@
 <mujoco model="Hopper2D">
     <compiler inertiafromgeom="true" angle="radian"/>
-    <option timestep="0.001" integrator="implicit" cone="elliptic"
+    <option timestep="0.1" integrator="implicit" cone="elliptic"
             solver="Newton" tolerance="1e-10"/>
 
     <default>
@@ -20,10 +20,10 @@
         <geom name="floor" type="plane" size="5 5 0.25" material="ground"/>
 
         <!-- Root floating base -->
-        <body name="root" pos="0 0 0.6">
+        <body name="root" pos="0 0 0.8">
             <joint name="slide_x" type="slide" axis="1 0 0"/>
             <joint name="slide_z" type="slide" axis="0 0 1"/>
-            <joint name="hinge_y" type="hinge" axis="0 1 0"/>
+            <!-- <joint name="hinge_y" type="hinge" axis="0 1 0"/> -->
 
             <!-- Torso -->
             <body name="base" pos="0 0 0">
@@ -53,11 +53,11 @@
                               mass="0.6"/>
 
                         <!-- Foot -->
-                        <geom name="foot"
+                        <!-- <geom name="foot"
                               type="sphere"
                               pos="0.4 0 0"
                               size="0.04"
-                              mass="0.1"/>
+                              mass="0.1"/> -->
                     </body>
                 </body>
             </body>
@@ -66,8 +66,8 @@
 
     <actuator>
         <motor name="hip_motor" joint="hip"
-               ctrlrange="-40 40" ctrllimited="true"/>
+               ctrlrange="-100 100" ctrllimited="true"/>
         <motor name="knee_motor" joint="knee"
-               ctrlrange="-60 60" ctrllimited="true"/>
+               ctrlrange="-1000 1000" ctrllimited="true"/>
     </actuator>
 </mujoco>
