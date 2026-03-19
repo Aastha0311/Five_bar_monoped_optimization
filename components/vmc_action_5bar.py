@@ -112,9 +112,31 @@ class Controller:
     # Ground contact
     # ---------------------------------------------------
 
+    # def get_ground_contact_forces(self):
+
+    #     ground_id = mj.mj_name2id(self.m, mj.mjtObj.mjOBJ_GEOM, "floor")
+
+    #     contact_list = []
+
+    #     for i in range(self.d.ncon):
+
+    #         con = self.d.contact[i]
+
+    #         if con.geom1 == ground_id or con.geom2 == ground_id:
+
+    #             force = np.zeros(6)
+    #             mj.mj_contactForce(self.m, self.d, i, force)
+
+    #             contact_list.append((force[:3], con))
+
+    #     return contact_list
+
     def get_ground_contact_forces(self):
 
         ground_id = mj.mj_name2id(self.m, mj.mjtObj.mjOBJ_GEOM, "floor")
+
+        foot_left_id = mj.mj_name2id(self.m, mj.mjtObj.mjOBJ_GEOM, "foot_left")
+        foot_right_id = mj.mj_name2id(self.m, mj.mjtObj.mjOBJ_GEOM, "foot_right")
 
         contact_list = []
 
@@ -122,12 +144,18 @@ class Controller:
 
             con = self.d.contact[i]
 
+            # check if this is ground contact
             if con.geom1 == ground_id or con.geom2 == ground_id:
 
-                force = np.zeros(6)
-                mj.mj_contactForce(self.m, self.d, i, force)
+                # check if the OTHER geom is one of the feet
+                other_geom = con.geom2 if con.geom1 == ground_id else con.geom1
 
-                contact_list.append((force[:3], con))
+                if other_geom in [foot_left_id, foot_right_id]:
+
+                    force = np.zeros(6)
+                    mj.mj_contactForce(self.m, self.d, i, force)
+
+                    contact_list.append((force[:3], con))
 
         return contact_list
 

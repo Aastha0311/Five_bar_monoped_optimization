@@ -10,6 +10,7 @@ import mujoco.viewer
 # import vmc_roc_angle as vmc_ra_angle
 import pandas as pd
 from scipy.interpolate import interp1d
+import imageio
 
 # Set fixed random seed for deterministic behavior
 np.random.seed(0)
@@ -22,6 +23,13 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
 
     m.opt.iterations = 500
     m.opt.tolerance = 1e-10
+    # record_video = True
+    # video_filename = "5bar_test_jump.mp4"
+    # video_fps = 30
+
+    # if record_video:
+    #     renderer = mj.Renderer(m, width=640, height=480)
+    #     frames = []
 
     # -----------------------
     # Joint IDs
@@ -29,8 +37,8 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
     hip_left_id  = mj.mj_name2id(m, mj.mjtObj.mjOBJ_JOINT, "hip_left")
     hip_right_id = mj.mj_name2id(m, mj.mjtObj.mjOBJ_JOINT, "hip_right")
 
-    hip_left_dof  = m.jnt_dofadr[hip_left_id]
-    hip_right_dof = m.jnt_dofadr[hip_right_id]
+    hip_left_dof  = m.jnt_dofadr[hip_left_id] #start address in qvel array for this joint
+    hip_right_dof = m.jnt_dofadr[hip_right_id] 
 
     slide_x_id = mj.mj_name2id(m, mj.mjtObj.mjOBJ_JOINT, "slide_x")
     slide_z_id = mj.mj_name2id(m, mj.mjtObj.mjOBJ_JOINT, "slide_z")
@@ -54,21 +62,11 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
     d.qpos[m.joint("knee_right").qposadr[0]] = q2_r
 
     # Move root so foot touches ground
-    d.qpos[m.joint("slide_z").qposadr[0]] = -ik_value
-    #mujoco.mj_forward(m, d)
-
-    # d.qpos[hip_left_dof]  = q1_l
-    # d.qpos[hip_right_dof] = q1_r
-
-    # -----------------------
-    # Jump tracking
-    # -----------------------
+    #d.qpos[m.joint("slide_z").qposadr[0]] = -ik_value    
     jump_results = []
     jump_count = 0
-
     jump_started = False
     jump_phase = "ground"
-
     current_jump_max_height = -1e12
     current_jump_start_x = 0
     current_jump_energy = 0
@@ -89,11 +87,14 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
     phase = "LOAD"      # LOAD → PUSH → FLIGHT → RESET
     push_time = 0.0
     push_duration = push_duration   # 80 ms push window
-    lean_angle = 0.2   
-    max_sim_time = 8.0    # forward lean only during push
+    lean_angle = 0.0  
+    max_sim_time = 30.0    # forward lean only during push
     t_elapsed = 0.0
-    while t_elapsed < max_sim_time and jump_count < 3:
-            
+
+    # with mujoco.viewer.launch_passive(m, d) as viewer:
+    #     while viewer.is_running():
+            #while t_elapsed < max_sim_time and jump_count < 3:
+    while jump_count < 1:
 
             # if time.time() - start > max_sim_time:
             #     break
@@ -105,7 +106,7 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
             # ===================================================
             # 5 SECOND IK STABILIZATION (ADDED BLOCK)
             # ===================================================
-            if t_elapsed < 2.0:
+            if t_elapsed < 0.05:
 
                 q_l = d.qpos[m.joint("hip_left").qposadr[0]]
                 q_r = d.qpos[m.joint("hip_right").qposadr[0]]
@@ -115,12 +116,12 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
 
                 d.ctrl[0] = kp*(q1_l - q_l) - kd*qd_l
                 d.ctrl[1] = kp*(q1_r - q_r) - kd*qd_r             
-
+            
                 
                 
 
                 mj.mj_step(m, d)
-                
+                #viewer.sync()
                 
                 continue
             # ===================================================
@@ -146,7 +147,7 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
             # -----------------------
             # Jump detection
             # -----------------------
-       
+    
             
             if on_ground:
 
@@ -176,6 +177,7 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
 
                     if jump_duration > 0:
                         current_jump_avg_vel = jump_distance / jump_duration
+                        current_jump_avg_vel = abs(current_jump_avg_vel)
                         avg_vz = jump_dz / jump_duration
                     else:
                         current_jump_avg_vel = 0
@@ -277,7 +279,7 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
             d.ctrl[hip_left_actuator_id]  = efficiency_left*hip_left_torque
             d.ctrl[hip_right_actuator_id] = efficiency_right*hip_right_torque
 
-            if jump_started and t_elapsed > 2.0 and phase in ["PUSH"]:
+            if jump_started and phase in ["PUSH"]:
                 # Mechanical energy (work done by actuators)
                 ha1 = m.opt.timestep * hip_left_torque * d.qvel[hip_left_dof]            
                 ha2 = m.opt.timestep * hip_right_torque * d.qvel[hip_right_dof]
@@ -315,6 +317,11 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
             
 
             mj.mj_step(m, d)
+            #viewer.sync()
+            # if record_video:
+            #     renderer.update_scene(d)
+            #     frame = renderer.render()
+            #     frames.append(frame.copy())
             
 
         # -----------------------
@@ -339,6 +346,12 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
         best_duration = best_jump[7]
         best_x_vel = best_jump[8]
 
+    # if record_video:
+    #     renderer.close()
+    #     imageio.mimsave(video_filename, frames, fps=video_fps)
+    #     print(f"Video saved to {video_filename}")
+
+
     return (
         best_height,
         best_x_vel,
@@ -347,32 +360,33 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
         best_duration,
         jump_results
     )
-        
+                
 
     # return jump_results
         
         
 
 
-# xml_path = "/home/stochlab/repo/optimal-design-legged-robots/xmls/5bar_base.xml"   # <-- path to your XML
+xml_path = "/home/stochlab/repo/optimal-design-legged-robots/xmls/design_xmls/0dd5167c.xml"   # <-- path to your XML
 
 # # IK settings
-# ik_height = -0.6
-# thigh_length = 0.4
-# calf_length = 0.4
-# hip_offset = 0.05
+ik_height = -0.3
+thigh_length = 0.22252482719749359
+calf_length = 0.206840194636663
+hip_offset = 0.050793396782675845
+efficiency_left = 0.9
+efficiency_right = 0.9
+# Torque limit
+hip_peak_torque = 10000
 
-# # Torque limit
-# hip_peak_torque = 10000
-
-# # Spring-damper-torsion gains
-# # [linear_kp, linear_kd, rotational_kp]
-# action = np.array([150.0, 1.0, 25.0])
+# Spring-damper-torsion gains
+# [linear_kp, linear_kd, rotational_kp]
+action = np.array([100.0, 1.0, 25.0])
 
 
-# # -------------------------------------------------------
-# # RUN SIMULATION
-# # -------------------------------------------------------
+# -------------------------------------------------------
+# RUN SIMULATION
+# -------------------------------------------------------
 
 # results = run(
 #     xml_path=xml_path,
@@ -388,7 +402,15 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
 #     R= 0.186  # 80 ms push
 # )
 
-# print("Jump results (height, distance, euclidean, total_energy, mech_energy, joule_energy):")
-# for i, (height, distance, euclidean, total_energy, mech_energy, joule_energy, jump_distance, jump_duration, current_jump_avg_vel, avg_vz) in enumerate(results):
-#     print(f"Jump {i+1}: Height={height:.4f} m, Distance={distance:.4f} m, Euclidean={euclidean:.4f} m, Total Energy={total_energy:.4f} J, Mechanical Energy={mech_energy:.4f} J, Joule Energy={joule_energy:.4f} J, Jump Distance={results[i][6]:.4f} m, Jump Duration={results[i][7]:.4f} s, Average Velocity={results[i][8]:.4f} m/s, Average Vertical Velocity={results[i][9]:.4f} m/s")
+results = run(xml_path, action, ik_value=ik_height, hip1_peak_torque=hip_peak_torque,
+    hip2_peak_torque=hip_peak_torque, thigh_length=thigh_length,
+    calf_length=calf_length,
+    hip_offset=hip_offset,
+    push_duration=0.1, efficiency_left=efficiency_left, efficiency_right=efficiency_right)
+
+print("Best Jump Height: {:.4f} m".format(results[0]))
+print("Best Jump Forward Velocity: {:.4f} m/s".format(results[1]))
+print("Best Jump Distance: {:.4f} m".format(results[2]))
+print("Best Jump Energy: {:.4f} J".format(results[3]))
+print("Best Jump Duration: {:.4f} s".format(results[4]))
 

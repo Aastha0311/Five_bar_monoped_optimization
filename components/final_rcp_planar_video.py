@@ -24,7 +24,7 @@ def run(xml_path, action, ik_value, hip_peak_torque, thigh_length, calf_length, 
 # Video Recording Setup
 # -----------------------
     record_video = True
-    video_filename = "5bar_jump.mp4"
+    video_filename = "5bar_planar_jump.mp4"
     video_fps = 30
 
     if record_video:
@@ -65,7 +65,7 @@ def run(xml_path, action, ik_value, hip_peak_torque, thigh_length, calf_length, 
     d.qpos[m.joint("knee_right").qposadr[0]] = q2_r
 
     # Move root so foot touches ground
-    d.qpos[m.joint("slide_z").qposadr[0]] = -ik_value
+    #d.qpos[m.joint("slide_z").qposadr[0]] = -ik_value
     mujoco.mj_forward(m, d)
 
     # d.qpos[hip_left_dof]  = q1_l
@@ -350,14 +350,15 @@ def compute_ground_reaction_force(m, d):
             total_grf += f_world
 
     return total_grf
-xml_path = "/home/stochlab/repo/optimal-design-legged-robots/xmls/5bar_base.xml"   # <-- path to your XML
+xml_path = "/home/stochlab/repo/optimal-design-legged-robots/xmls/design_xmls/0dd5167c.xml"   # <-- path to your XML
 
-# IK settings
-ik_height = -0.6
-thigh_length = 0.4
-calf_length = 0.4
-hip_offset = 0.05
-
+# # IK settings
+ik_height = -0.3
+thigh_length = 0.22252482719749359
+calf_length = 0.206840194636663
+hip_offset = 0.050793396782675845
+efficiency_left = 0.9
+efficiency_right = 0.9
 # Torque limit
 hip_peak_torque = 10000
 
@@ -370,15 +371,21 @@ action = np.array([150.0, 1.0, 25.0])
 # RUN SIMULATION
 # -------------------------------------------------------
 
-results = run(
-    xml_path=xml_path,
-    action=action,
-    ik_value=ik_height,
-    hip_peak_torque=hip_peak_torque,
+# results = run(
+#     xml_path=xml_path,
+#     action=action,
+#     ik_value=ik_height,
+#     hip1_peak_torque=hip_peak_torque,
+#     hip2_peak_torque=hip_peak_torque,
+#     thigh_length=thigh_length,
+#     calf_length=calf_length,
+#     hip_offset=hip_offset,
+#     push_duration=0.1,
+#     kv=100,
+#     R= 0.186  # 80 ms push
+# )
+
+results = run(xml_path, action, ik_value=ik_height, hip_peak_torque=hip_peak_torque,
     thigh_length=thigh_length,
     calf_length=calf_length,
-    hip_offset=hip_offset
-)
-
-# print("\nSimulation finished.")
-# print("Returned:", results)
+    hip_offset=hip_offset)
