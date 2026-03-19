@@ -241,29 +241,29 @@ def run(xml_path, action, ik_value, hip_peak_torque, knee_peak_torque, thigh_len
         best_duration,
         jump_results
     )
-xml_path = "/home/stochlab/repo/optimal-design-legged-robots/xmls/stoch3.xml"   # <-- path to your XML
+# xml_path = "/home/stochlab/repo/optimal-design-legged-robots/xmls/stoch3.xml"   # <-- path to your XML
 
-# # # IK settings
-ik_height = -0.3
-thigh_length = 0.297
-calf_length = 0.302
-hip_peak_torque = 20.626480624709636
-knee_peak_torque = 28.126268979854057
-efficiency_hip = 0.952
-efficiency_knee = 0.952
-# # Torque limit
-# hip_peak_torque = 10000
+# # # # IK settings
+# ik_height = -0.3
+# thigh_length = 0.297
+# calf_length = 0.302
+# hip_peak_torque = 20.626480624709636
+# knee_peak_torque = 28.126268979854057
+# efficiency_hip = 0.952
+# efficiency_knee = 0.952
+# # # Torque limit
+# # hip_peak_torque = 10000
 
-# # Spring-damper-torsion gains
-# # [linear_kp, linear_kd, rotational_kp]
-action = np.array([550.0, 5.0, 30.0])
+# # # Spring-damper-torsion gains
+# # # [linear_kp, linear_kd, rotational_kp]
+# action = np.array([550.0, 5.0, 30.0])
 
-results = run(xml_path, action, ik_value=ik_height, hip_peak_torque=hip_peak_torque,
-    knee_peak_torque=knee_peak_torque, thigh_length=thigh_length,
-    calf_length=calf_length, efficiency_hip=efficiency_hip, efficiency_knee=efficiency_knee)
+# results = run(xml_path, action, ik_value=ik_height, hip_peak_torque=hip_peak_torque,
+#     knee_peak_torque=knee_peak_torque, thigh_length=thigh_length,
+#     calf_length=calf_length, efficiency_hip=efficiency_hip, efficiency_knee=efficiency_knee)
 
-print("Best Jump Height: {:.4f} m".format(results[0]))
-print("Best Jump Forward Velocity: {:.4f} m/s".format(results[1]))
-print("Best Jump Distance: {:.4f} m".format(results[2]))
-print("Best Jump Energy: {:.4f} J".format(results[3]))
-print("Best Jump Duration: {:.4f} s".format(results[4]))
+# print("Best Jump Height: {:.4f} m".format(results[0]))
+# print("Best Jump Forward Velocity: {:.4f} m/s".format(results[1]))
+# print("Best Jump Distance: {:.4f} m".format(results[2]))
+# print("Best Jump Energy: {:.4f} J".format(results[3]))
+# print("Best Jump Duration: {:.4f} s".format(results[4]))
