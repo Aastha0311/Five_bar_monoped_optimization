@@ -893,3 +893,91 @@ ac3: 25.2
 ----------------------------------------
 
 
+Primary CSV - Entry with Lowest Best Cost: 60, 40 REPEATED
+
+thigh_length: 0.2591125106854449
+calf_length: 0.1657517658065057
+motor_left_name: nan
+motor_right_name: nan
+gear_left_ratio: 6.149743033753097
+gear_right_ratio: 4.002135285111905
+gearbox_left: nan
+gearbox_right: nan
+torso_distance: 0.08507516196782
+ik_height: 0.3624470608145306
+best_index: 5.0
+best_cost: 0.3235987695122573
+ac1: 709.7
+ac2: 0.1
+ac3: 36.1
+
+Matching Entry/Entries from Secondary CSV:
+
+Thigh: 0.259163979969404
+Calf: 0.1657632253782754
+Hip left motor: U8
+Hip right motor: MAD_M6C12
+Hip left ratio: 6.149365344026608
+Hip right ratio: 4.003070390157118
+Gearbox left: SSPG
+Gearbox right: CPG
+Efficiency left: 0.958
+Efficiency right: 0.963
+Torso distance: 0.0850027353042042
+ik_height: 0.3625283127163744
+Best X velocity: 4.669983262057238
+Average energy: 5.45980817273924
+Max height: 0.0884640518252957
+Max distance: 0.1549433566882961
+Unique id: 18feb6fd
+Cost: 0.3246029888361419
+ac1: 709.7
+ac2: 0.1
+ac3: 36.1
+
+----------------------------------------
+
+
+Primary CSV - Entry with Lowest Best Cost: 59, 41
+
+thigh_length: 0.3063210072788564
+calf_length: 0.159122025209546
+motor_left_name: nan
+motor_right_name: nan
+gear_left_ratio: 7.202633996800345
+gear_right_ratio: 4.000428823470639
+gearbox_left: nan
+gearbox_right: nan
+torso_distance: 0.0500286006294846
+ik_height: 0.4115798355976305
+best_index: 4.0
+best_cost: 0.2665282843691396
+ac1: 308.7
+ac2: 1.6
+ac3: 42.7
+
+Matching Entry/Entries from Secondary CSV:
+
+Thigh: 0.3063212145834697
+Calf: 0.1591223310788984
+Hip left motor: U8
+Hip right motor: MAD_M6C12
+Hip left ratio: 7.202634411167154
+Hip right ratio: 4.000425984893613
+Gearbox left: CPG
+Gearbox right: CPG
+Efficiency left: 0.942
+Efficiency right: 0.963
+Torso distance: 0.0500291020091451
+ik_height: 0.4115803891226122
+Best X velocity: 5.320994765024818
+Average energy: 5.63991428634872
+Max height: 0.0771652006005377
+Max distance: 0.1703368773711007
+Unique id: e6214f24
+Cost: 0.3023897044239869
+ac1: 308.7
+ac2: 1.6
+ac3: 42.7
+
+----------------------------------------

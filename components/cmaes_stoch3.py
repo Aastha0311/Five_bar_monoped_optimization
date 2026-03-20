@@ -41,8 +41,8 @@ for coeff_set in coefficient_sets:
         date_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         
         # Update filenames to include coefficient values
-        best_results_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/stoch3/best_dist_25_{coeff_str}_{date_str}_{seed}.csv"
-        all_samples_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/stoch3/all_dist_25_{coeff_str}_{date_str}_{seed}.csv"
+        best_results_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/stoch3/20/best_dist_20_{coeff_str}_{date_str}_{seed}.csv"
+        all_samples_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/stoch3/20/all_dist_20_{coeff_str}_{date_str}_{seed}.csv"
         
         # Ensure directories exist
         os.makedirs(os.path.dirname(best_results_file), exist_ok=True)
@@ -441,7 +441,7 @@ for coeff_set in coefficient_sets:
                 # COST
                 # -------------------------
 
-                cost = coeff1 * (-best_distance * 25) + coeff2 * (best_energy)
+                cost = coeff1 * (-best_distance * 20) + coeff2 * (best_energy)
 
                 # -------------------------
                 # SAVE ALL RUNS
@@ -460,7 +460,7 @@ for coeff_set in coefficient_sets:
                             gearbox_hip, gearbox_knee, efficiency_hip, efficiency_knee,
                             torso_distance,ik_height, r["xvel"], r["energy"],
                             r["height"], r["distance"],
-                            unique_id
+                            unique_id, cost,
                         ] + list(controller_params))
 
                 return cost
@@ -497,7 +497,7 @@ for coeff_set in coefficient_sets:
 
         with open(all_samples_file, "a", newline="") as file:
             writer = csv.writer(file)
-            writer.writerow(["Thigh", "Calf", "Hip motor", "Knee motor", "Hip ratio", "Knee ratio", "Gearbox hip", "Gearbox knee", "Efficiency hip", "Efficiency knee", "Torso distance", "ik_height", "Best X velocity", "Average energy", "Max height", "Max distance", "Unique id"] + [f"ac{i+1}" for i in range(3)])
+            writer.writerow(["Thigh", "Calf", "Hip motor", "Knee motor", "Hip ratio", "Knee ratio", "Gearbox hip", "Gearbox knee", "Efficiency hip", "Efficiency knee", "Torso distance", "ik_height", "Best X velocity", "Average energy", "Max height", "Max distance", "Unique id", "Cost"] + [f"ac{i+1}" for i in range(3)])
 
         if __name__ == "__main__":
 

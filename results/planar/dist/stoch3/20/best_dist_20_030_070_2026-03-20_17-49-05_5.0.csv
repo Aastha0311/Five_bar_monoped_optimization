@@ -1,0 +1,2 @@
+thigh_length,calf_length,motor_hip_name,motor_knee_name,gear_hip_ratio,gear_knee_ratio,gearbox_hip,gearbox_knee,torso_distance,ik_height,best_index,best_cost,ac1,ac2,ac3
+0.297,0.302,U10,U10,6.0,6.0,SSPG,SSPG,0.125,0.3845417302846151,4,5.737386710431938,726.4,3.5,32.6

@@ -2,8 +2,8 @@ import pandas as pd
 import numpy as np
 
 # File paths
-primary_csv = '/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/20_all/best_dist_25_058_041_2026-03-20_16-44-03_5.0.csv'
-secondary_csv = '/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/20_all/all_dist_25_058_041_2026-03-20_16-44-03_5.0.csv'
+primary_csv = '/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/20_all/best_dist_25_059_041_2026-03-20_17-30-41_5.0.csv'
+secondary_csv = '/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/20_all/all_dist_25_059_041_2026-03-20_17-30-41_5.0.csv'
 output_txt = '/home/stochlab/repo/optimal-design-legged-robots/results/analysis/5bar20.txt'
 
 # Load primary CSV
@@ -92,8 +92,8 @@ if missing_secondary:
 tolerance = 1e-20
 # #the filtered rows should have the same thigh length and calf length as the values with the thigh and calf length of the cost with the least value
 
-#filtered_rows = df2[np.isclose(df2['Thigh'], best_thigh, atol=tolerance) & np.isclose(df2['Calf'], best_calf, atol=tolerance) & np.isclose(df2['Hip left ratio'], best_hip_left_ratio, atol=tolerance) & np.isclose(df2['Hip right ratio'], best_hip_right_ratio, atol=tolerance)  & np.isclose(df2['ac1'], best_ac1, atol=tolerance) & np.isclose(df2['ac2'], best_ac2, atol=tolerance) & np.isclose(df2['ac3'], best_ac3, atol=tolerance) & (df2['Hip left motor'] == best_hip_left_motor) & (df2['Hip right motor'] == best_hip_right_motor) & (df2['Gearbox left'] == best_gearbox_left) & (df2['Gearbox right'] == best_gearbox_right)]
-filtered_rows = df2[ np.isclose(df2['ac1'], best_ac1, atol=tolerance) & np.isclose(df2['ac2'], best_ac2, atol=tolerance) & np.isclose(df2['ac3'], best_ac3, atol=tolerance)]
+filtered_rows = df2[np.isclose(df2['Thigh'], best_thigh, atol=tolerance) & np.isclose(df2['Calf'], best_calf, atol=tolerance) & np.isclose(df2['Hip left ratio'], best_hip_left_ratio, atol=tolerance) & np.isclose(df2['Hip right ratio'], best_hip_right_ratio, atol=tolerance)  & np.isclose(df2['ac1'], best_ac1, atol=tolerance) & np.isclose(df2['ac2'], best_ac2, atol=tolerance) & np.isclose(df2['ac3'], best_ac3, atol=tolerance) ]
+#filtered_rows = df2[ np.isclose(df2['ac1'], best_ac1, atol=tolerance) & np.isclose(df2['ac2'], best_ac2, atol=tolerance) & np.isclose(df2['ac3'], best_ac3, atol=tolerance)]
 
 # # # Match: Then by Thigh, Calf, Hip gear ratio, Knee gear ratio (also with tolerance)
 # # for col in ['Thigh','Calf','Hip left motor','Hip right motor','Hip left ratio','Hip right ratio','Gearbox left','Gearbox right','Torso distance','Best X velocity','Average energy','Max height','Max distance','Unique id','ac1','ac2','ac3']:
