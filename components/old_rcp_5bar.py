@@ -24,7 +24,7 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
     m.opt.tolerance = 1e-10
 
     record_video = True
-    video_filename = "5bar_old_planar_jump.mp4"
+    video_filename = "5bar_best_6337_20.mp4"
     video_fps = 100
     if record_video:
         renderer = mj.Renderer(m, width=1920, height=1080)
@@ -320,26 +320,26 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
                 best_duration,
                 jump_results
             )
-xml_path = "/home/stochlab/repo/optimal-design-legged-robots/xmls/design_xmls/2b62a6a0.xml"   # <-- path to your XML
+xml_path = "/home/stochlab/repo/optimal-design-legged-robots/xmls/design_xmls/8e295352.xml"   # <-- path to your XML
 
 # # # IK settings
-base_height = 0.339633797303443
+base_height = 0.3731016763707068
 foot_radius = 0.0
 
 ik_height = -(base_height - foot_radius) - 0.00
 #ik_height = -0.3
-thigh_length = 0.2521662038874983
-calf_length = 0.2825643088581008
-hip_offset = 0.0725532200977169*0.5
-efficiency_left = 0.957
+thigh_length = 0.2718712948929698
+calf_length = 0.1770451334924181
+hip_offset = 0.0500674163906261*0.5
+efficiency_left = 0.942
 efficiency_right = 0.963
 # Torque limit
-hip2_peak_torque = 4.001240636707923*2.304
-hip1_peak_torque = 4.966*4.550113711048554
+hip2_peak_torque = 4.000354855714441*2.304
+hip1_peak_torque = 2.292*7.249979475775106
 
 # Spring-damper-torsion gains
 # [linear_kp, linear_kd, rotational_kp]
-action = np.array([460.4, 3.0, 17.7])
+action = np.array([571.8, 7.5, 34.3])
 
 results = run(xml_path, action, ik_value=ik_height, hip1_peak_torque=hip1_peak_torque,
     hip2_peak_torque=hip2_peak_torque, thigh_length=thigh_length,

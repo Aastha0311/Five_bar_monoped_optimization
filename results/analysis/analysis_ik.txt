@@ -834,7 +834,7 @@ ac3: 39.9
 ----------------------------------------
 
 
-Primary CSV - Entry with Lowest Best Cost: 58,42 - POSSIBLE RESULT
+Primary CSV - Entry with Lowest Best Cost: 58,42 - BEST POSSIBLE RESULT
 
 thigh_length: 0.2360291669934203
 calf_length: 0.2054424989314047

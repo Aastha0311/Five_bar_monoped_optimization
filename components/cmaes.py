@@ -19,7 +19,7 @@ import old_rcp_5bar_wovideo as rcp
 import json 
 # Define the coefficient sets
 coefficient_sets = []
-for first_coeff in np.arange(0.56, 0.59, 0.01):  # 0.4 to 0.8 with step 0.05
+for first_coeff in np.arange(0.59, 0.60, 0.01):  # 0.4 to 0.8 with step 0.05
     second_coeff = 1.0 - first_coeff
     coefficient_sets.append((first_coeff, second_coeff))
 
@@ -41,8 +41,8 @@ for coeff_set in coefficient_sets:
         date_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         
         # Update filenames to include coefficient values
-        best_results_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/best_dist_25_{coeff_str}_{date_str}_{seed}.csv"
-        all_samples_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/all_dist_25_{coeff_str}_{date_str}_{seed}.csv"
+        best_results_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/20_all/best_dist_25_{coeff_str}_{date_str}_{seed}.csv"
+        all_samples_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/20_all/all_dist_25_{coeff_str}_{date_str}_{seed}.csv"
         
         # Ensure directories exist
         os.makedirs(os.path.dirname(best_results_file), exist_ok=True)
@@ -487,7 +487,7 @@ for coeff_set in coefficient_sets:
                 # COST
                 # -------------------------
 
-                cost = coeff1 * (-best_distance * 25) + coeff2 * (best_energy)
+                cost = coeff1 * (-best_distance * 20) + coeff2 * (best_energy)
 
                 # -------------------------
                 # SAVE ALL RUNS
@@ -506,7 +506,7 @@ for coeff_set in coefficient_sets:
                             gearbox_left, gearbox_right, efficiency_left, efficiency_right,
                             torso_distance,ik_height, r["xvel"], r["energy"],
                             r["height"], r["distance"],
-                            unique_id
+                            unique_id, cost,
                         ] + list(controller_params))
 
                 return cost
@@ -543,7 +543,7 @@ for coeff_set in coefficient_sets:
 
         with open(all_samples_file, "a", newline="") as file:
             writer = csv.writer(file)
-            writer.writerow(["Thigh", "Calf", "Hip left motor", "Hip right motor", "Hip left ratio", "Hip right ratio", "Gearbox left", "Gearbox right", "Efficiency left", "Efficiency right", "Torso distance", "ik_height", "Best X velocity", "Average energy", "Max height", "Max distance", "Unique id"] + [f"ac{i+1}" for i in range(3)])
+            writer.writerow(["Thigh", "Calf", "Hip left motor", "Hip right motor", "Hip left ratio", "Hip right ratio", "Gearbox left", "Gearbox right", "Efficiency left", "Efficiency right", "Torso distance", "ik_height", "Best X velocity", "Average energy", "Max height", "Max distance", "Unique id", "Cost"] + [f"ac{i+1}" for i in range(3)])
 
         if __name__ == "__main__":
 

@@ -24,8 +24,8 @@ def run(xml_path, action, ik_value, hip_peak_torque, knee_peak_torque, thigh_len
     m.opt.iterations = 500  
     m.opt.tolerance = 1e-10
     record_video = True
-    video_filename = "2bar_stoch3_40.mp4"
-    video_fps = 30
+    video_filename = "2bar_stoch3_optimised.mp4"
+    video_fps = 1000
     if record_video:
         renderer = mj.Renderer(m, width=640, height=480)
         frames = []
@@ -255,10 +255,10 @@ def run(xml_path, action, ik_value, hip_peak_torque, knee_peak_torque, thigh_len
                 best_duration,
                 jump_results
             )
-xml_path = "/home/stochlab/repo/optimal-design-legged-robots/xmls/stoch3_40.xml"   # <-- path to your XML
+xml_path = "/home/stochlab/repo/optimal-design-legged-robots/xmls/stoch3_xmls/566cd06c.xml"   # <-- path to your XML
 
 # # # IK settings
-ik_height = -0.40
+ik_height = -0.300054399767156
 thigh_length = 0.297
 calf_length = 0.302
 hip_peak_torque = 20.626480624709636
@@ -270,7 +270,7 @@ efficiency_knee = 0.952
 
 # # Spring-damper-torsion gains
 # # [linear_kp, linear_kd, rotational_kp]
-action = np.array([550.0, 5.0, 30.0])
+action = np.array([748.5, 2.4, 10.0])
 
 results = run(xml_path, action, ik_value=ik_height, hip_peak_torque=hip_peak_torque,
     knee_peak_torque=knee_peak_torque, thigh_length=thigh_length,

@@ -32,3 +32,569 @@ efficiency_knee = 0.952
 # # Spring-damper-torsion gains
 # # [linear_kp, linear_kd, rotational_kp]
 action = np.array([550.0, 5.0, 30.0])
+
+-----------------------------------------------------------
+Primary CSV - Entry with Lowest Best Cost: 30,70
+
+thigh_length: 0.297
+calf_length: 0.302
+motor_hip_name: nan
+motor_knee_name: nan
+gear_hip_ratio: 6.0
+gear_knee_ratio: 6.0
+gearbox_hip: nan
+gearbox_knee: nan
+torso_distance: 0.125
+ik_height: 0.4135354266444365
+best_index: 3.0
+best_cost: 5.355038038741329
+ac1: 1000.0
+ac2: 9.9
+ac3: 10.0
+
+Matching Entry/Entries from Secondary CSV:
+
+Thigh: 0.297
+Calf: 0.302
+Hip motor: U10
+Knee motor: U10
+Hip ratio: 6.0
+Knee ratio: 6.0
+Gearbox hip: SSPG
+Gearbox knee: SSPG
+Efficiency hip: 0.952
+Efficiency knee: 0.952
+Torso distance: 0.125
+ik_height: 0.4135354266444365
+Best X velocity: 0.0188370569472505
+Average energy: 8.2688074373584
+Max height: 0.2187959276454815
+Max distance: 0.0577502889879402
+Unique id: 7bbe5777
+ac1: 1000.0
+ac2: 9.9
+ac3: 10.0
+
+----------------------------------------
+Primary CSV - Entry with Lowest Best Cost: 35,65
+
+thigh_length: 0.297
+calf_length: 0.302
+motor_hip_name: nan
+motor_knee_name: nan
+gear_hip_ratio: 6.0
+gear_knee_ratio: 6.0
+gearbox_hip: nan
+gearbox_knee: nan
+torso_distance: 0.125
+ik_height: 0.4146078578233907
+best_index: 1.0
+best_cost: 2.750611747531003
+ac1: 50.0
+ac2: 10.0
+ac3: 10.0
+
+Matching Entry/Entries from Secondary CSV:
+
+Thigh: 0.297
+Calf: 0.302
+Hip motor: U10
+Knee motor: U10
+Hip ratio: 6.0
+Knee ratio: 6.0
+Gearbox hip: SSPG
+Gearbox knee: SSPG
+Efficiency hip: 0.952
+Efficiency knee: 0.952
+Torso distance: 0.125
+ik_height: 0.4135362715321946
+Best X velocity: 0.0159542386865603
+Average energy: 4.958819667181861
+Max height: 0.1415505101212393
+Max distance: 0.0537610810672596
+Unique id: ba3b0c8a
+ac1: 50.0
+ac2: 10.0
+ac3: 10.0
+
+----------------------------------------
+
+Primary CSV - Entry with Lowest Best Cost: 40,60
+
+thigh_length: 0.297
+calf_length: 0.302
+motor_hip_name: nan
+motor_knee_name: nan
+gear_hip_ratio: 6.0
+gear_knee_ratio: 6.0
+gearbox_hip: nan
+gearbox_knee: nan
+torso_distance: 0.125
+ik_height: 0.4101111618260966
+best_index: 3.0
+best_cost: 4.416567317868409
+ac1: 999.7
+ac2: 1.9
+ac3: 10.0
+
+Matching Entry/Entries from Secondary CSV:
+
+Thigh: 0.297
+Calf: 0.302
+Hip motor: U10
+Knee motor: U10
+Hip ratio: 6.0
+Knee ratio: 6.0
+Gearbox hip: SSPG
+Gearbox knee: SSPG
+Efficiency hip: 0.952
+Efficiency knee: 0.952
+Torso distance: 0.125
+ik_height: 0.4101104497681409
+Best X velocity: 0.0225977072711321
+Average energy: 8.620441253553887
+Max height: 0.2261853285511647
+Max distance: 0.0606737328610073
+Unique id: dc693f59
+ac1: 999.7
+ac2: 1.9
+ac3: 10.0
+
+----------------------------------------
+
+
+Primary CSV - Entry with Lowest Best Cost: 45,55
+
+thigh_length: 0.297
+calf_length: 0.302
+motor_hip_name: nan
+motor_knee_name: nan
+gear_hip_ratio: 6.0
+gear_knee_ratio: 6.0
+gearbox_hip: nan
+gearbox_knee: nan
+torso_distance: 0.125
+ik_height: 0.5967340719298252
+best_index: 0.0
+best_cost: -0.6517785530395972
+ac1: 50.0
+ac2: 0.0
+ac3: 10.0
+
+Matching Entry/Entries from Secondary CSV:
+
+Thigh: 0.297
+Calf: 0.302
+Hip motor: U10
+Knee motor: U10
+Hip ratio: 6.0
+Knee ratio: 6.0
+Gearbox hip: SSPG
+Gearbox knee: SSPG
+Efficiency hip: 0.952
+Efficiency knee: 0.952
+Torso distance: 0.125
+ik_height: 0.589
+Best X velocity: 0.0376173812940077
+Average energy: 0.0537784130532512
+Max height: 0.0873763560027174
+Max distance: 0.0605650382416787
+Unique id: 964da9b3
+ac1: 50.0
+ac2: 0.0
+ac3: 10.0
+
+----------------------------------------
+
+Primary CSV - Entry with Lowest Best Cost: 50, 50 - POSSIBLE RESULT
+
+thigh_length: 0.297
+calf_length: 0.302
+motor_hip_name: nan
+motor_knee_name: nan
+gear_hip_ratio: 6.0
+gear_knee_ratio: 6.0
+gearbox_hip: nan
+gearbox_knee: nan
+torso_distance: 0.125
+ik_height: 0.3031434391454741
+best_index: 5.0
+best_cost: 3.097905815688306
+ac1: 624.0
+ac2: 4.0
+ac3: 10.4
+
+Matching Entry/Entries from Secondary CSV:
+
+Thigh: 0.297
+Calf: 0.302
+Hip motor: U10
+Knee motor: U10
+Hip ratio: 6.0
+Knee ratio: 6.0
+Gearbox hip: SSPG
+Gearbox knee: SSPG
+Efficiency hip: 0.952
+Efficiency knee: 0.952
+Torso distance: 0.125
+ik_height: 0.3031434391454741
+Best X velocity: 0.0488812368849344
+Average energy: 10.47374614123691
+Max height: 0.2665273498366355
+Max distance: 0.1711173803944119
+Unique id: 05fd3255
+ac1: 624.0
+ac2: 4.0
+ac3: 10.4
+
+----------------------------------------
+
+
+Primary CSV - Entry with Lowest Best Cost: 55,45
+
+thigh_length: 0.297
+calf_length: 0.302
+motor_hip_name: nan
+motor_knee_name: nan
+gear_hip_ratio: 6.0
+gear_knee_ratio: 6.0
+gearbox_hip: nan
+gearbox_knee: nan
+torso_distance: 0.125
+ik_height: 0.3905826760846645
+best_index: 3.0
+best_cost: 1.4452145752622032
+ac1: 50.4
+ac2: 10.0
+ac3: 10.1
+
+Matching Entry/Entries from Secondary CSV:
+
+Thigh: 0.297
+Calf: 0.302
+Hip motor: U10
+Knee motor: U10
+Hip ratio: 6.0
+Knee ratio: 6.0
+Gearbox hip: SSPG
+Gearbox knee: SSPG
+Efficiency hip: 0.952
+Efficiency knee: 0.952
+Torso distance: 0.125
+ik_height: 0.3888800240820113
+Best X velocity: 0.0222942241336945
+Average energy: 5.528266208636424
+Max height: 0.1565718714234049
+Max distance: 0.0730255882406408
+Unique id: 85f5767a
+ac1: 50.4
+ac2: 10.0
+ac3: 10.1
+
+----------------------------------------
+
+
+Primary CSV - Entry with Lowest Best Cost: 60,40 - POSSIBLE RESULT
+
+thigh_length: 0.297
+calf_length: 0.302
+motor_hip_name: nan
+motor_knee_name: nan
+gear_hip_ratio: 6.0
+gear_knee_ratio: 6.0
+gearbox_hip: nan
+gearbox_knee: nan
+torso_distance: 0.125
+ik_height: 0.3000204241835774
+best_index: 4.0
+best_cost: 1.603658243266397
+ac1: 728.4
+ac2: 1.1
+ac3: 10.0
+
+Matching Entry/Entries from Secondary CSV:
+
+Thigh: 0.297
+Calf: 0.302
+Hip motor: U10
+Knee motor: U10
+Hip ratio: 6.0
+Knee ratio: 6.0
+Gearbox hip: SSPG
+Gearbox knee: SSPG
+Efficiency hip: 0.952
+Efficiency knee: 0.952
+Torso distance: 0.125
+ik_height: 0.3000206520272422
+Best X velocity: 0.0531430315763919
+Average energy: 10.611562174139676
+Max height: 0.2692544876424988
+Max distance: 0.1760640273530222
+Unique id: dc3aa466
+ac1: 728.4
+ac2: 1.1
+ac3: 10.0
+
+----------------------------------------
+
+
+Primary CSV - Entry with Lowest Best Cost: 65, 35 - CHECK RESULT
+
+thigh_length: 0.297
+calf_length: 0.302
+motor_hip_name: nan
+motor_knee_name: nan
+gear_hip_ratio: 6.0
+gear_knee_ratio: 6.0
+gearbox_hip: nan
+gearbox_knee: nan
+torso_distance: 0.125
+ik_height: 0.3
+best_index: 2.0
+best_cost: 0.4061268114234759
+ac1: 51.1
+ac2: 8.8
+ac3: 10.0
+
+Matching Entry/Entries from Secondary CSV:
+
+Thigh: 0.297
+Calf: 0.302
+Hip motor: U10
+Knee motor: U10
+Hip ratio: 6.0
+Knee ratio: 6.0
+Gearbox hip: SSPG
+Gearbox knee: SSPG
+Efficiency hip: 0.952
+Efficiency knee: 0.952
+Torso distance: 0.125
+ik_height: 0.301338650167668
+Best X velocity: 0.0431792746638574
+Average energy: 7.773896948834436
+Max height: 0.2049493736122024
+Max distance: 0.1418112454679544
+Unique id: 72a20ef5
+ac1: 51.1
+ac2: 8.8
+ac3: 10.0
+
+----------------------------------------
+
+
+Primary CSV - Entry with Lowest Best Cost: 70, 30 - POSSIBLE RESULT
+
+thigh_length: 0.297
+calf_length: 0.302
+motor_hip_name: nan
+motor_knee_name: nan
+gear_hip_ratio: 6.0
+gear_knee_ratio: 6.0
+gearbox_hip: nan
+gearbox_knee: nan
+torso_distance: 0.125
+ik_height: 0.3000204241835825
+best_index: 1.0
+best_cost: 0.1023420359272324
+ac1: 635.6
+ac2: 5.9
+ac3: 10.0
+
+Matching Entry/Entries from Secondary CSV:
+
+Thigh: 0.297
+Calf: 0.302
+Hip motor: U10
+Knee motor: U10
+Hip ratio: 6.0
+Knee ratio: 6.0
+Gearbox hip: SSPG
+Gearbox knee: SSPG
+Efficiency hip: 0.952
+Efficiency knee: 0.952
+Torso distance: 0.125
+ik_height: 0.3000206304255453
+Best X velocity: 0.0580474784950331
+Average energy: 10.611561540164622
+Max height: 0.2692544715160642
+Max distance: 0.1760640497366075
+Unique id: b9a0b03f
+ac1: 635.6
+ac2: 5.9
+ac3: 10.0
+
+----------------------------------------
+
+
+Primary CSV - Entry with Lowest Best Cost: 75, 25 - POSSIBLE RESULT
+
+thigh_length: 0.297
+calf_length: 0.302
+motor_hip_name: nan
+motor_knee_name: nan
+gear_hip_ratio: 6.0
+gear_knee_ratio: 6.0
+gearbox_hip: nan
+gearbox_knee: nan
+torso_distance: 0.125
+ik_height: 0.3000204241835826
+best_index: 6.0
+best_cost: -0.6483160677423863
+ac1: 748.5
+ac2: 2.4
+ac3: 10.0
+
+Matching Entry/Entries from Secondary CSV:
+
+Thigh: 0.297
+Calf: 0.302
+Hip motor: U10
+Knee motor: U10
+Hip ratio: 6.0
+Knee ratio: 6.0
+Gearbox hip: SSPG
+Gearbox knee: SSPG
+Efficiency hip: 0.952
+Efficiency knee: 0.952
+Torso distance: 0.125
+ik_height: 0.300054399767156
+Best X velocity: 0.0512834968697719
+Average energy: 10.612552832822931
+Max height: 0.2692796836292861
+Max distance: 0.1760290565423164
+Unique id: 566cd06c
+ac1: 748.5
+ac2: 2.4
+ac3: 10.0
+
+----------------------------------------
+
+
+Primary CSV - Entry with Lowest Best Cost: 80,20 - POSSIBLE RESULT
+
+thigh_length: 0.297
+calf_length: 0.302
+motor_hip_name: nan
+motor_knee_name: nan
+gear_hip_ratio: 6.0
+gear_knee_ratio: 6.0
+gearbox_hip: nan
+gearbox_knee: nan
+torso_distance: 0.125
+ik_height: 0.3000204241835836
+best_index: 2.0
+best_cost: -1.3989741714121051
+ac1: 828.5
+ac2: 3.3
+ac3: 10.0
+
+Matching Entry/Entries from Secondary CSV:
+
+Thigh: 0.297
+Calf: 0.302
+Hip motor: U10
+Knee motor: U10
+Hip ratio: 6.0
+Knee ratio: 6.0
+Gearbox hip: SSPG
+Gearbox knee: SSPG
+Efficiency hip: 0.952
+Efficiency knee: 0.952
+Torso distance: 0.125
+ik_height: 0.300020420298584
+Best X velocity: 0.0576681363417147
+Average energy: 10.608751567642162
+Max height: 0.2692543146489199
+Max distance: 0.1752040538588266
+Unique id: 994a9bbe
+ac1: 828.5
+ac2: 3.3
+ac3: 10.0
+
+----------------------------------------
+
+
+Primary CSV - Entry with Lowest Best Cost: 85,15 - POSSIBLE RESULT
+
+thigh_length: 0.297
+calf_length: 0.302
+motor_hip_name: nan
+motor_knee_name: nan
+gear_hip_ratio: 6.0
+gear_knee_ratio: 6.0
+gearbox_hip: nan
+gearbox_knee: nan
+torso_distance: 0.125
+ik_height: 0.3000204241835774
+best_index: 5.0
+best_cost: -2.1496322750818777
+ac1: 750.8
+ac2: 2.0
+ac3: 10.0
+
+Matching Entry/Entries from Secondary CSV:
+
+Thigh: 0.297
+Calf: 0.302
+Hip motor: U10
+Knee motor: U10
+Hip ratio: 6.0
+Knee ratio: 6.0
+Gearbox hip: SSPG
+Gearbox knee: SSPG
+Efficiency hip: 0.952
+Efficiency knee: 0.952
+Torso distance: 0.125
+ik_height: 0.3000213350326437
+Best X velocity: 0.0525088119848924
+Average energy: 10.611582219319736
+Max height: 0.2692549975311605
+Max distance: 0.1760633196251797
+Unique id: fe6e12c9
+ac1: 750.8
+ac2: 2.0
+ac3: 10.0
+
+----------------------------------------
+Primary CSV - Entry with Lowest Best Cost: 90, 10 - POSSIBLE  RESULT
+
+thigh_length: 0.297
+calf_length: 0.302
+motor_hip_name: nan
+motor_knee_name: nan
+gear_hip_ratio: 6.0
+gear_knee_ratio: 6.0
+gearbox_hip: nan
+gearbox_knee: nan
+torso_distance: 0.125
+ik_height: 0.3000204241835839
+best_index: 6.0
+best_cost: -2.9002903787511087
+ac1: 530.0
+ac2: 4.4
+ac3: 10.0
+
+Matching Entry/Entries from Secondary CSV:
+
+Thigh: 0.297
+Calf: 0.302
+Hip motor: U10
+Knee motor: U10
+Hip ratio: 6.0
+Knee ratio: 6.0
+Gearbox hip: SSPG
+Gearbox knee: SSPG
+Efficiency hip: 0.952
+Efficiency knee: 0.952
+Torso distance: 0.125
+ik_height: 0.3000204241978553
+Best X velocity: 0.0516254958108461
+Average energy: 10.611555487720988
+Max height: 0.2692543175598627
+Max distance: 0.1760642634288189
+Unique id: 0fe0f849
+ac1: 530.0
+ac2: 4.4
+ac3: 10.0
+
+----------------------------------------
