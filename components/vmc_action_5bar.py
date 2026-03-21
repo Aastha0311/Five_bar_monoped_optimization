@@ -4,7 +4,7 @@ import numpy as np
 
 class Controller:
 
-    def __init__(self, m, d, xml_path, action, ori_l=10.0, ori_theta=0.0):
+    def __init__(self, m, d, xml_path, action, ori_l=10, ori_theta=0.0):
 
         self.m = m
         self.d = d

@@ -16,7 +16,7 @@ np.random.seed(0)
 random.seed(0)
 import mujoco.viewer
 
-def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_length, calf_length, hip_offset, efficiency_left, efficiency_right):
+def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_left_length, calf_left_length, thigh_right_length, calf_right_length, hip_offset, efficiency_left, efficiency_right):
     m = mj.MjModel.from_xml_path(xml_path)
     d = mj.MjData(m)
 
@@ -47,11 +47,12 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
     # -----------------------
     hip_left_actuator_id  = m.actuator('motor_left').id
     hip_right_actuator_id = m.actuator('motor_right').id
-
+    torque_left_store = []
+    torque_right_store = []
     # -----------------------
     # Spawn from IK
     # -----------------------
-    q1_l, q2_l, q1_r, q2_r = ik.ik_5bar(0.0, ik_value, thigh_length, calf_length, hip_offset)
+    q1_l, q2_l, q1_r, q2_r = ik.ik_5bar(0.0, ik_value, thigh_left_length, calf_left_length, thigh_right_length, calf_right_length, hip_offset)
     d.qpos[m.joint("hip_left").qposadr[0]] = q1_l
     d.qpos[m.joint("knee_left").qposadr[0]] = q2_l
     d.qpos[m.joint("hip_right").qposadr[0]] = q1_r
@@ -69,9 +70,9 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
     tracking_jump = False
     # hip_actuator_id = m.actuator('torque1').id    
     # knee_actuator_id = m.actuator('torque2').id    
-    l1n = thigh_length
-    l2n = calf_length
-
+    
+    r_left = 0.186
+    r_right = 0.063
 
     # theta1, theta2 = ik.inverse_kinematics(0, ik_value, l1n, l2n)
     
@@ -93,9 +94,12 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
     current_jump_avg_vel = 0
     kp = 300
     kd = 30
-    
+    prev_torque_left = 0
+    prev_torque_right = 0
     # Joule heating constant
     kt = 0.0955
+    kt_left = 9.55/100
+    kt_right = 9.55/150
     max_steps = 2000
     step_counter = 0
     # with mujoco.viewer.launch_passive(m, d) as viewer:
@@ -226,13 +230,18 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
         # Apply Control Torques
         hip_left_torque = np.clip(hip_left_torque, -hip1_peak_torque, hip1_peak_torque)
         hip_right_torque = np.clip(hip_right_torque, -hip2_peak_torque, hip2_peak_torque)
-        
+        # hip_left_torque = 0.2*hip_left_torque + 0.5*prev_torque_left
+        # hip_right_torque = 0.5*hip_right_torque + 0.5*prev_torque_right
+        # prev_torque_left = efficiency_left*hip_left_torque
+        # prev_torque_right = efficiency_right*hip_right_torque
         d.ctrl[hip_left_actuator_id] = efficiency_left * hip_left_torque
         d.ctrl[hip_right_actuator_id] = efficiency_right * hip_right_torque
+        torque_left_store.append(efficiency_left*hip_left_torque)
+        torque_right_store.append(efficiency_right*hip_right_torque)
 
-        
         # Calculate energy for the current jump (starts from ground contact with positive velocity)
-        if jump_started and t_elapsed >= 0:
+        #if jump_started and t_elapsed >= 0:
+        if jump_started and t_elapsed >= 0 and on_ground and current_base_vel > 0 and jump_phase != "landing" and jump_started:
             # Mechanical energy (work done by actuators)
             ha1 = m.opt.timestep * efficiency_left*hip_left_torque * d.qvel[hip_left_dof]            
             ha2 = m.opt.timestep * efficiency_right*hip_right_torque * d.qvel[hip_right_dof]
@@ -241,19 +250,20 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
             if ha2 < 0:
                 ha2 = 0
             mech_energy_step = ha1 + ha2
-            
+            #print(efficiency_left*hip_left_torque, efficiency_right*hip_right_torque)
             # Joule heating energy (I²R losses)
-            hip_joule = kt * (hip_left_torque**2) * m.opt.timestep
-            knee_joule = kt * (hip_right_torque**2) * m.opt.timestep
-            joule_energy_step = hip_joule + knee_joule
+            hip_left_joule = (1/kt_left) * (1/kt_left)* ((efficiency_left*hip_left_torque)**2) * m.opt.timestep*r_left
+            hip_right_joule = (1/kt_right) * (1/kt_right)* ((efficiency_right*hip_right_torque)**2) * m.opt.timestep*r_right
+            joule_energy_step = hip_left_joule + hip_right_joule
             
             # Total energy (mechanical + joule)
-            total_energy_step = mech_energy_step 
+            total_energy_step = mech_energy_step
             
             # Update jump energy accumulators
             current_jump_mech_energy += mech_energy_step
             current_jump_joule_energy += joule_energy_step
             current_jump_total_energy += total_energy_step
+            #print(m.opt.timestep, efficiency_left*hip_left_torque, efficiency_right*hip_right_torque, mech_energy_step, joule_energy_step, total_energy_step)
             
             # Also track total energy for all jumps
             hip_energy += ha1
@@ -295,7 +305,8 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
         best_energy = best_jump[3]
         best_duration = best_jump[7]
         best_x_vel = best_jump[8]
-
+        # print(torque_left_store)
+        # print(torque_right_store)
     # if record_video:
     #     renderer.close()
     #     imageio.mimsave(video_filename, frames, fps=video_fps)
@@ -310,22 +321,22 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
         best_duration,
         jump_results
     )
-# xml_path = "/home/stochlab/repo/optimal-design-legged-robots/xmls/design_xmls/23df2338.xml"   # <-- path to your XML
+# xml_path = "/home/stochlab/repo/optimal-design-legged-robots/xmls/design_xmls/8778abeb.xml"   # <-- path to your XML
 
 # # # # IK settings
-# ik_height = -0.3
-# thigh_length = 0.2687093801610552
-# calf_length = 0.2152223385381638
-# hip_offset = 0.0927409130309515*0.5
-# efficiency_left = 0.906
-# efficiency_right = 0.843
+# ik_height = -0.4203276682254768
+# thigh_length = 0.3046289869522943
+# calf_length = 0.190030742101534
+# hip_offset = 0.0500076970975257*0.5
+# efficiency_left = 0.963
+# efficiency_right = 0.939
 # # Torque limit
-# hip2_peak_torque = 6.576770366300338*2.304
-# hip1_peak_torque = 2.292*29.592858752843657
+# hip2_peak_torque = 9.04999755345784*2.304
+# hip1_peak_torque = 2.292*4.000092005818691
 
 # # Spring-damper-torsion gains
 # # [linear_kp, linear_kd, rotational_kp]
-# action = np.array([339.4, 9.8, 37.1])
+# action = np.array([357.6, 9.9,29.1])
 
 
 # results = run(xml_path, action, ik_value=ik_height, hip1_peak_torque=hip1_peak_torque,

@@ -2,9 +2,9 @@ import pandas as pd
 import numpy as np
 
 # File paths
-primary_csv = '/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/20_all/best_dist_25_059_041_2026-03-20_17-30-41_5.0.csv'
-secondary_csv = '/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/20_all/all_dist_25_059_041_2026-03-20_17-30-41_5.0.csv'
-output_txt = '/home/stochlab/repo/optimal-design-legged-robots/results/analysis/5bar20.txt'
+primary_csv = '/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/2bar/best_20_comb_030_070_2026-03-21_06-41-51_5.0.csv'
+secondary_csv = '/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/2bar/all_20_comb_030_070_2026-03-21_06-41-51_5.0.csv'
+output_txt = '/home/stochlab/repo/optimal-design-legged-robots/results/analysis/2bar_20.txt'
 
 # Load primary CSV
 df1 = pd.read_csv(primary_csv)
@@ -13,13 +13,12 @@ print(df1.columns)
 print(df2.columns)
 
 #Ensure required columns
-required_cols = ['thigh_length', 'calf_length', 'motor_left_name', 'motor_right_name',
-       'gear_left_ratio', 'gear_right_ratio', 'gearbox_left', 'gearbox_right',
-       'torso_distance', 'best_index', 'best_cost', 'ac1', 'ac2', 'ac3']
-# required_cols = ['thigh_length', 'calf_length', 'motor_hip_name', 'motor_knee_name',
-#        'gear_hip_ratio', 'gear_knee_ratio', 'gearbox_hip', 'gearbox_knee',
-#        'torso_distance', 'ik_height', 'best_index', 'best_cost', 'ac1', 'ac2',
-#        'ac3']
+# required_cols = ['thigh_length', 'calf_length', 'motor_left_name', 'motor_right_name',
+#        'gear_left_ratio', 'gear_right_ratio', 'gearbox_left', 'gearbox_right',
+#        'torso_distance', 'best_index', 'best_cost', 'ac1', 'ac2', 'ac3']
+required_cols = ['thigh_length', 'calf_length', 'motor_hip_name', 'motor_knee_name',
+       'gear_hip_ratio', 'gear_knee_ratio', 'gearbox_hip', 'gearbox_knee',
+       'ik_height', 'best_index', 'best_cost', 'ac1', 'ac2', 'ac3']
 missing_cols = [col for col in required_cols if col not in df1.columns]
 if missing_cols:
     raise ValueError(f"Primary CSV missing columns: {missing_cols}")
@@ -29,32 +28,32 @@ for col in required_cols:
 
 # # # Get row with lowest Best Cost
 min_row = df1.loc[df1['best_cost'].idxmin()]
-best_cost_value = min_row['best_cost']
-best_thigh = min_row['thigh_length']
-best_calf = min_row['calf_length']
-best_hip_left_ratio = min_row['gear_left_ratio']
-best_hip_right_ratio = min_row['gear_right_ratio']
-best_hip_left_motor = min_row['motor_left_name']
-best_hip_right_motor = min_row['motor_right_name']
-best_gearbox_left = min_row['gearbox_left']
-best_gearbox_right = min_row['gearbox_right']
-best_ac1 = min_row['ac1']
-best_ac2 = min_row['ac2']
-best_ac3 = min_row['ac3']
-
-# min_row = df1.loc[df1['best_cost'].idxmin()]
 # best_cost_value = min_row['best_cost']
 # best_thigh = min_row['thigh_length']
 # best_calf = min_row['calf_length']
-# best_hip_ratio = min_row['gear_hip_ratio']
-# best_knee_ratio = min_row['gear_knee_ratio']
-# best_hip_left_motor = min_row['motor_hip_name']
-# best_hip_right_motor = min_row['motor_knee_name']
-# best_gearbox_left = min_row['gearbox_hip']
-# best_gearbox_right = min_row['gearbox_knee']
+# best_hip_left_ratio = min_row['gear_left_ratio']
+# best_hip_right_ratio = min_row['gear_right_ratio']
+# best_hip_left_motor = min_row['motor_left_name']
+# best_hip_right_motor = min_row['motor_right_name']
+# best_gearbox_left = min_row['gearbox_left']
+# best_gearbox_right = min_row['gearbox_right']
 # best_ac1 = min_row['ac1']
 # best_ac2 = min_row['ac2']
 # best_ac3 = min_row['ac3']
+
+min_row = df1.loc[df1['best_cost'].idxmin()]
+best_cost_value = min_row['best_cost']
+best_thigh = min_row['thigh_length']
+best_calf = min_row['calf_length']
+best_hip_ratio = min_row['gear_hip_ratio']
+best_knee_ratio = min_row['gear_knee_ratio']
+best_hip_left_motor = min_row['motor_hip_name']
+best_hip_right_motor = min_row['motor_knee_name']
+best_gearbox_left = min_row['gearbox_hip']
+best_gearbox_right = min_row['gearbox_knee']
+best_ac1 = min_row['ac1']
+best_ac2 = min_row['ac2']
+best_ac3 = min_row['ac3']
 
 # # # Convert primary row to text
 primary_output = ["Primary CSV - Entry with Lowest Best Cost:\n"]

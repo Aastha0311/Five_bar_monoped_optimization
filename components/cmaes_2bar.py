@@ -16,13 +16,13 @@ from scipy.interpolate import interp1d
 import sys, os
 #sys.path.append("/home/stochlab/repo/Aastha_Coopt_Monoped/Monoped-optimization")
 #from Aastha_Coopt_Monoped.Final_humanoids_results.cma_ll_gear import modify_link_length_and_angle
-import final_rcp_noslide_2bar as rcp
+import old_rcp_2bar_wovideo as rcp
 
 import json
 
 # Define the coefficient sets
 coefficient_sets = []
-for first_coeff in np.arange(0.65, 0.70, 0.05):  # 0.4 to 0.8 with step 0.05
+for first_coeff in np.arange(0.30, 0.90, 0.05):  # 0.4 to 0.8 with step 0.05
     second_coeff = 1.0 - first_coeff
     coefficient_sets.append((first_coeff, second_coeff))
 
@@ -39,13 +39,13 @@ for coeff_set in coefficient_sets:
     for seed in seed_list:
         print(f"\n\n========== Running optimization for SEED = {seed} ==========\n")
 
-        xml_template = "/home/stochlab/repo/optimal-design-legged-robots/xmls/2bar_base.xml"
+        xml_template = "/home/stochlab/repo/optimal-design-legged-robots/xmls/stoch3.xml"
           
         date_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         
         # Update filenames to include coefficient values
-        best_results_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/planar/comb/2r_comb_{coeff_str}_{date_str}_{seed}.csv"
-        all_samples_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/planar/comb/2r_all_comb_{coeff_str}_{date_str}_{seed}.csv"
+        best_results_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/2bar/best_20_comb_{coeff_str}_{date_str}_{seed}.csv"
+        all_samples_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/2bar/all_20_comb_{coeff_str}_{date_str}_{seed}.csv"
         
         # Ensure directories exist
         os.makedirs(os.path.dirname(best_results_file), exist_ok=True)
@@ -54,14 +54,15 @@ for coeff_set in coefficient_sets:
         original_bounds = np.array([
             [0.15, 0.35],  # Thigh length
             [0.15, 0.35], 
+            [0.3, 0.6],
              [1,6],
               [1, 6], # Calf length
             [4, 60], 
             [4, 60],
-            [50, 500],    # Controller Param 1
+            [50, 1000],    # Controller Param 1
             [0, 10], 
             [10, 50], 
-            [0.05, 0.20]     # Controller Param        # Controller Param 6
+                 # Controller Param        # Controller Param 6
         ])
         import pandas as pd
 
@@ -135,7 +136,7 @@ for coeff_set in coefficient_sets:
             #get gearbox from the row
             gearbox = row["gearbox"]
 
-            print(f"Selected Motor: {motor_name}, Gear Ratio: {ratio}, Mass: {mass}, Efficiency: {efficiency}")
+            #print(f"Selected Motor: {motor_name}, Gear Ratio: {ratio}, Mass: {mass}, Efficiency: {efficiency}")
 
             return mass, efficiency, gearbox
 
@@ -213,83 +214,77 @@ for coeff_set in coefficient_sets:
             theta1 = np.arctan2(A*x + B*z, x*B - A*z)
             return theta1, theta2
         
-        def modify_5bar_xml(
-                xml_file,
-                output_file,
-                base_height,
-                l1,
-                l2,    
-                torque_hip,
-                torque_knee,
-                mass_hip,
-                mass_knee,
-                thigh_interp_func,
-                calf_interp_func):
+        def modify_link_length_and_angle(xml_file, output_file, 
+                                            thigh_length, calf_length,
+                                            hip_peak_torque, knee_peak_torque,
+                                            efficiency_hip, efficiency_knee,
+                                            mass_hip_actuator, mass_knee_actuator,
+                                            target_base_height):
+                
+                # Compute joint angles
+                l1, l2 = thigh_length, calf_length
+                #l1, l2 = 0.4, 0.4  # Default values for testing
+                # hip_peak_torque = thigh_gear_ratio*5.5
+                # knee_peak_torque = knee_gear_ratio*5.5*1.3636
+                theta1, theta2 = inverse_kinematics(0, -target_base_height, l1, l2)   
 
-            tree = ET.parse(xml_file)
-            root = tree.getroot()
+                # Compute (x, z) vector for thigh and shank using rotation
+                thigh_vec = [l1 * np.sin(theta1), 0, -l1 * np.cos(theta1)]
+                knee_pos = thigh_vec
+                shank_vec = [l2 * np.sin(theta1 + theta2), 0, 
+                            -l2 * np.cos(theta1 + theta2)]
 
-            # -----------------------------
-            # Link masses from interpolation
-            # -----------------------------
-            thigh_mass = float(thigh_interp_func(l1))
-            calf_mass = float(calf_interp_func(l2))
-            print(f"Interpolated thigh mass for length {l1:.3f} m: {thigh_mass:.3f} kg")
-            print(f"Interpolated calf mass for length {l2:.3f} m: {calf_mass:.3f} kg")
-            # -----------------------------
-            # Update torso width + mass
-            # -----------------------------
+                tree = ET.parse(xml_file)
+                root = tree.getroot()
+                calf_offset = -0.025*np.cos(theta1 + theta2)
+                calf_x_offset = 0.025*np.sin(theta1 + theta2)
+                theta1d = theta1 * 180 / np.pi
+                theta2d = theta2 * 180 / np.pi
+                # hip_actuator_mass = act_interp_func(thigh_gear_ratio)
+                # knee_actuator_mass = act_interp_func(knee_gear_ratio)
+                torso_mass = mass_hip_actuator + mass_knee_actuator
+                #torso_mass = 0.0
+                # thigh_link_mass = 0
+                # calf_link_mass = 0
+                thigh_link_mass = thigh_interp_func(thigh_length) 
+                calf_link_mass = calf_interp_func(calf_length)
+                for worldbody in root.findall('worldbody'):
+                    for torso in worldbody.findall('body'):
+                        torso.set('pos', f"0 0 {target_base_height}")
+                        for base in torso.findall('body'):
+                            for geom in base.findall('geom'):
+                                if torso_mass:
+                                    geom.set('mass', str(torso_mass))
+                            for thigh in base.findall('body'):
+                                if thigh.get('name') == "link1":
+                                    thigh.set('pos', "0 0 0")
+                                    thigh.set('euler', f"0 {(np.pi*0.5)-theta1} 0")
+                                    for geom in thigh.findall('geom'):
+                                        if geom.get('name') == "thigh":                            
+                                            geom.set('fromto', f"0 0 0 {l1} 0 0")
+                                            if thigh_link_mass:
+                                                geom.set('mass', str(thigh_link_mass))
+                                    for joint in thigh.findall('joint'):                        
+                                        joint.set('pos', "0 0 0")
+                                for calf in thigh.findall('body'):
+                                    if calf.get('name') == "link2":                        
+                                        calf.set('pos', f"{l1} 0 0")
+                                        calf.set('euler', f"0 {-theta2} 0")                        
+                                        for geom in calf.findall('geom'):
+                                            if geom.get('name') == "shank":                            
+                                                geom.set('fromto', f"0 0 0 {l2} 0 0")                            
+                                                if calf_link_mass:
+                                                    geom.set('mass', str(calf_link_mass))                            
+                                        for joint in calf.findall('joint'):                            
+                                            joint.set('pos', "0 0 0")
+                # Update ctrlrange if needed
+                for motor in root.findall(".//motor"):
+                    if motor.get("name") == "torque1" and hip_peak_torque:
+                        motor.set("ctrlrange", f"-{efficiency_hip*hip_peak_torque} {efficiency_hip*hip_peak_torque}")
+                    elif motor.get("name") == "torque2" and knee_peak_torque:
+                        motor.set("ctrlrange", f"-{efficiency_knee*knee_peak_torque} {efficiency_knee*knee_peak_torque}")
 
-            for body in root.findall(".//body[@name='root']"):
-                pos = body.get("pos").split()
-                pos[2] = str(base_height)
-                body.set("pos", " ".join(pos))
-            for geom in root.findall(".//geom[@name='torso']"):  
-
-                base_mass = 0.0
-                total_mass = base_mass + mass_hip + mass_knee
-                geom.set("mass", str(total_mass))
-
-            
-
-            # -----------------------------
-            # Update thigh lengths + mass
-            # -----------------------------
-            for geom in root.findall(".//geom[@name='thigh']"):
-                geom.set("fromto", f"0 0 0 {l1} 0 0")
-                geom.set("mass", str(thigh_mass))
-
-            
-
-            # -----------------------------
-            # Move knee joints
-            # -----------------------------
-            for body in root.findall(".//body[@name='link2']"):
-                body.set("pos", f"{l2} 0 0")
-
-            
-            # -----------------------------
-            # Update calf/shank lengths + mass
-            # -----------------------------
-            for geom in root.findall(".//geom[@name='shank']"):
-                geom.set("fromto", f"0 0 0 {l2} 0 0")
-                geom.set("mass", str(calf_mass))
-
-           
-
-            
-           
-
-            # -----------------------------
-            # Update torque limits
-            # -----------------------------
-            for motor in root.findall(".//motor[@name='torque1']"):
-                motor.set("ctrlrange", f"-{torque_hip} {torque_hip}")
-
-            for motor in root.findall(".//motor[@name='torque2']"):
-                motor.set("ctrlrange", f"-{torque_knee} {torque_knee}")
-
-            tree.write(output_file)
+                tree.write(output_file)
 
         import pandas as pd
 
@@ -316,7 +311,7 @@ for coeff_set in coefficient_sets:
 
             # continuous torque
             tau_cont = Kt * I_cont
-            print(f"Continuous torque for {motor_name}: {tau_cont:.3f} Nm")
+            #print(f"Continuous torque for {motor_name}: {tau_cont:.3f} Nm")
 
             return tau_cont
 
@@ -334,103 +329,161 @@ for coeff_set in coefficient_sets:
 
         def get_cost(params):
 
-            params = denormalize(params)
+            try:
 
-            thigh_length = params[0]
-            calf_length = params[1]
-            
+                params = denormalize(params)
 
-            motor_hip_name = motor_index_to_name(params[2])
-            motor_knee_name = motor_index_to_name(params[3])
+                thigh_length = params[0]
+                calf_length = params[1]
+                
+                ik_height = params[2]
+                max_reach = thigh_length + calf_length
+                min_reach = abs(thigh_length - calf_length)
+                ik_height = np.clip(ik_height, min_reach, max_reach-0.01)
+                motor_hip_name = motor_index_to_name(params[3])
+                motor_knee_name = motor_index_to_name(params[4])
 
-            gear_hip_ratio = params[4]
-            gear_knee_ratio = params[5]
+                gear_hip_ratio = params[5]
+                gear_knee_ratio = params[6]
 
-            push_duration = params[9]
-            controller_params = process_action(params[6:9])
+                controller_params = process_action(params[7:])
 
-            mass_hip, efficiency_hip, gearbox_hip = get_motor_gearbox_properties(
-                "/home/stochlab/repo/optimal_gearbox_selection.csv",
-                motor_hip_name,
-                gear_hip_ratio
-            )
+                mass_hip, efficiency_hip, gearbox_hip = get_motor_gearbox_properties(
+                    "/home/stochlab/repo/optimal_gearbox_selection.csv",
+                    motor_hip_name,
+                    gear_hip_ratio
+                )
 
-            mass_knee, efficiency_knee, gearbox_knee = get_motor_gearbox_properties(
-                "/home/stochlab/repo/optimal_gearbox_selection.csv",
-                motor_knee_name,
-                gear_knee_ratio
-            )
+                mass_knee, efficiency_knee, gearbox_knee = get_motor_gearbox_properties(
+                    "/home/stochlab/repo/optimal_gearbox_selection.csv",
+                    motor_knee_name,
+                    gear_knee_ratio
+                )
 
-            tau_hip = get_continuous_torque(
-                "/home/stochlab/repo/optimal-design-legged-robots/COMPAct/config_files/config.json",
-                "Motor" + motor_hip_name + "_framed"
-            )
-            tau_hip = tau_hip * gear_hip_ratio
-            tau_knee = get_continuous_torque(
-                "/home/stochlab/repo/optimal-design-legged-robots/COMPAct/config_files/config.json",
-                "Motor" + motor_knee_name + "_framed"
-            )
-            tau_knee = tau_knee * gear_knee_ratio
+                tau_hip = get_continuous_torque(
+                    "/home/stochlab/repo/optimal-design-legged-robots/COMPAct/config_files/config.json",
+                    "Motor" + motor_hip_name + "_framed"
+                ) * gear_hip_ratio
 
-            unique_id = uuid.uuid4().hex[:8]
+                tau_knee = get_continuous_torque(
+                    "/home/stochlab/repo/optimal-design-legged-robots/COMPAct/config_files/config.json",
+                    "Motor" + motor_knee_name + "_framed"
+                ) * gear_knee_ratio *1.3636
 
-            modified_xml = f"/home/stochlab/repo/optimal-design-legged-robots/xmls/design_xmls/{unique_id}.xml"
+                unique_id = uuid.uuid4().hex[:8]
 
-            modify_5bar_xml(
-                xml_template,
-                modified_xml,
-                0.3,
-                thigh_length,
-                calf_length,                
-                tau_hip,
-                tau_knee,
-                mass_hip,
-                mass_knee,
-                thigh_interp_func,
-                calf_interp_func
-            )
+                modified_xml = f"/home/stochlab/repo/optimal-design-legged-robots/xmls/2bar_xmls/{unique_id}.xml"
 
-            result = rcp.run(
-                modified_xml,
-                controller_params,
-                -0.3,
-                tau_hip,
-                tau_knee,
-                thigh_length,
-                calf_length,                
-                push_duration,
-                efficiency_hip,
-                efficiency_knee
-            )
+                modify_link_length_and_angle(
+                    xml_template,
+                    modified_xml,
+                    thigh_length, calf_length,
+                    tau_hip, tau_knee,
+                    efficiency_hip, efficiency_knee,
+                    mass_hip, mass_knee,
+                    ik_height)
 
-            if result is None:
+                # -------------------------
+                # RUN SIMULATION 5 TIMES
+                # -------------------------
+
+                run_results = []
+
+                for i in range(5):
+
+                    result = rcp.run(
+                        modified_xml,
+                        controller_params,
+                        -ik_height,
+                        tau_hip,
+                        tau_knee,
+                        thigh_length,
+                        calf_length,
+                        efficiency_hip,
+                        efficiency_knee
+                    )
+
+                    if result is None:
+                        continue
+
+                    best_height, best_x_vel, best_distance, best_energy, best_duration, jump_results = result
+
+                    best_x_vel = abs(best_x_vel)
+                    best_distance = abs(best_distance)
+
+                    run_results.append({
+                        "height": best_height,
+                        "xvel": best_x_vel,
+                        "distance": best_distance,
+                        "energy": best_energy,
+                        "duration": best_duration
+                    })
+
+                if len(run_results) == 0:
+                    return 1e6
+
+                # -------------------------
+                # MODE DISTANCE SELECTION
+                # -------------------------
+
+                rounded_distances = [round(r["distance"], 2) for r in run_results]
+
+                distance_counts = Counter(rounded_distances)
+                mode_distance = distance_counts.most_common(1)[0][0]
+
+                # pick first run matching the mode
+                selected_run = None
+
+                for r in run_results:
+                    if round(r["distance"], 2) == mode_distance:
+                        selected_run = r
+                        break
+
+                best_height = selected_run["height"]
+                best_x_vel = selected_run["xvel"]
+                best_distance = selected_run["distance"]
+                best_energy = selected_run["energy"]
+
+                # -------------------------
+                # COST
+                # -------------------------
+
+                cost = coeff1 * (-best_distance * 20) + coeff2 * (best_energy)
+
+                # -------------------------
+                # SAVE ALL RUNS
+                # -------------------------
+
+                with open(all_samples_file, "a", newline="") as file:
+
+                    writer = csv.writer(file)
+
+                    for r in run_results:
+
+                        writer.writerow([
+                            thigh_length, calf_length,
+                            motor_hip_name, motor_knee_name,
+                            gear_hip_ratio, gear_knee_ratio,
+                            gearbox_hip, gearbox_knee, efficiency_hip, efficiency_knee,
+                            ik_height, r["xvel"], r["energy"],
+                            r["height"], r["distance"],
+                            unique_id, cost,
+                        ] + list(controller_params))
+
+                return cost
+
+            except Exception as e:
+
+                print("Simulation failed:", e)
+
                 return 1e6
-
-            best_height, best_x_vel, best_distance, best_energy, best_duration, jump_results = result
-
-            if best_height < 0:
-                return 1e6
-            
-            
-            best_x_vel = abs(best_x_vel)
-            best_distance = abs(best_distance)
-            cost = coeff1*(-best_distance*5) + coeff2*best_energy
-            #cost = coeff1*(-best_x_vel*5) + coeff2*best_energy
-
-            with open(all_samples_file, "a", newline="") as file:
-                writer = csv.writer(file)
-                #writer.writerow([best_x_vel, best_height, best_energy])
-                writer.writerow([thigh_length, calf_length, motor_hip_name, motor_knee_name, gear_hip_ratio, gear_knee_ratio, gearbox_hip, gearbox_knee, push_duration, best_distance, best_energy, best_height, best_distance, unique_id] + list(controller_params))
-                file.flush()
-
-            return cost
 
         # CMA-ES Optimization
-        x0 = normalize(np.array([0.25, 0.25, 3, 4, 10.0, 10.0, 200, 5, 30, 0.125]))
+        x0 = normalize(np.array([0.25, 0.25, 0.35, 3, 4, 10.0, 10.0, 550, 5, 30]))
         sigma0 = 0.1
         opts = cma.CMAOptions()
         opts.set({
-            'maxiter': 10, 'popsize': 8, 'seed': int(seed),
+            'maxiter': 200, 'popsize': 8, 'seed': int(seed),
             'bounds': [np.zeros(10), np.ones(10)], 'verb_disp': 1000
         })
 
@@ -438,12 +491,12 @@ for coeff_set in coefficient_sets:
 
         with open(best_results_file, "a", newline="") as file:
             writer = csv.writer(file)
-            writer.writerow(["thigh_length", "calf_length", "motor_hip_name", "motor_knee_name", "gear_hip_ratio", "gear_knee_ratio", "gearbox_hip", "gearbox_knee", "push_duration", "best_index", "best_cost"] + [f"ac{i+1}" for i in range(3)])
+            writer.writerow(["thigh_length", "calf_length", "motor_hip_name", "motor_knee_name", "gear_hip_ratio", "gear_knee_ratio", "gearbox_hip", "gearbox_knee", "ik_height", "best_index", "best_cost"] + [f"ac{i+1}" for i in range(3)])
 
 
         with open(all_samples_file, "a", newline="") as file:
             writer = csv.writer(file)
-            writer.writerow(["Thigh", "Calf", "Hip motor", "Knee motor", "Hip gear ratio", "Knee gear ratio", "Gearbox hip", "Gearbox knee", "Push duration", "best_distance", "Average energy", "Max height", "Max distance", "Unique id"] + [f"ac{i+1}" for i in range(3)])
+            writer.writerow(["Thigh", "Calf", "Hip motor", "Knee motor", "Hip gear ratio", "Knee gear ratio", "Gearbox hip", "Gearbox knee", "efficiency_hip", "efficiency_knee", "ik_height", "best_distance", "Average energy", "Max height", "Max distance", "Unique id", "Cost"] + [f"ac{i+1}" for i in range(3)])
 
 
         while not es.stop():
@@ -454,15 +507,15 @@ for coeff_set in coefficient_sets:
             best_params = denormalize(solutions[best_index])
             best_cost = costs[best_index]
             thigh_length = best_params[0]
-            calf_length = best_params[1]            
-            motor_hip_number = best_params[2]
-            motor_knee_number = best_params[3]
+            calf_length = best_params[1]
+            ik_height = best_params[2]            
+            motor_hip_number = best_params[3]
+            motor_knee_number = best_params[4]
             motor_hip_name = motor_index_to_name(motor_hip_number)
             motor_knee_name = motor_index_to_name(motor_knee_number)
-            gear_hip_ratio = best_params[4]
-            gear_knee_ratio = best_params[5]
-            push_duration = best_params[9]
-            controller_params = process_action(best_params[6:9])
+            gear_hip_ratio = best_params[5]
+            gear_knee_ratio = best_params[6]            
+            controller_params = process_action(best_params[7:])
             mass_hip, efficiency_hip, gearbox_hip = get_motor_gearbox_properties(
                 "/home/stochlab/repo/optimal_gearbox_selection.csv",
                 motor_hip_name,
@@ -476,7 +529,7 @@ for coeff_set in coefficient_sets:
             
             with open(best_results_file, "a", newline="") as file:
                 writer = csv.writer(file)
-                writer.writerow([thigh_length, calf_length, motor_hip_name, motor_knee_name, gear_hip_ratio, gear_knee_ratio, gearbox_hip, gearbox_knee, push_duration, best_index, best_cost] + list(controller_params))
+                writer.writerow([thigh_length, calf_length, motor_hip_name, motor_knee_name, gear_hip_ratio, gear_knee_ratio, gearbox_hip, gearbox_knee, ik_height, best_index, best_cost] + list(controller_params))
             es.tell(solutions, costs)
             
 

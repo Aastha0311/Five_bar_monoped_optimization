@@ -19,7 +19,7 @@ import old_rcp_5bar_wovideo as rcp
 import json 
 # Define the coefficient sets
 coefficient_sets = []
-for first_coeff in np.arange(0.59, 0.60, 0.01):  # 0.4 to 0.8 with step 0.05
+for first_coeff in np.arange(0.56, 0.59, 0.01):  # 0.4 to 0.8 with step 0.05
     second_coeff = 1.0 - first_coeff
     coefficient_sets.append((first_coeff, second_coeff))
 
@@ -41,8 +41,8 @@ for coeff_set in coefficient_sets:
         date_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         
         # Update filenames to include coefficient values
-        best_results_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/20_all/best_dist_25_{coeff_str}_{date_str}_{seed}.csv"
-        all_samples_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/20_all/all_dist_25_{coeff_str}_{date_str}_{seed}.csv"
+        best_results_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/no_landing_energy/best_dist_25_{coeff_str}_{date_str}_{seed}.csv"
+        all_samples_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/no_landing_energy/all_dist_25_{coeff_str}_{date_str}_{seed}.csv"
         
         # Ensure directories exist
         os.makedirs(os.path.dirname(best_results_file), exist_ok=True)
@@ -224,7 +224,7 @@ for coeff_set in coefficient_sets:
             # -----------------------------
             # Link masses from interpolation
             # -----------------------------
-            thigh_mass = float(thigh_interp_func(l1))
+            thigh_mass = float(calf_interp_func(l1))
             calf_mass = float(calf_interp_func(l2))
             # print(f"Interpolated thigh mass for length {l1:.3f} m: {thigh_mass:.3f} kg")
             # print(f"Interpolated calf mass for length {l2:.3f} m: {calf_mass:.3f} kg")

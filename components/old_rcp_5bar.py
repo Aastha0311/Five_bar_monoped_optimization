@@ -20,12 +20,12 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
     m = mj.MjModel.from_xml_path(xml_path)
     d = mj.MjData(m)
 
-    m.opt.iterations = 500  
-    m.opt.tolerance = 1e-10
+    m.opt.iterations = 50  
+    m.opt.tolerance = 1e-6
 
     record_video = True
     video_filename = "5bar_best_6337_20.mp4"
-    video_fps = 100
+    video_fps = 10
     if record_video:
         renderer = mj.Renderer(m, width=1920, height=1080)
         frames = []
@@ -100,8 +100,8 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
     current_jump_start_x = 0
     current_jump_start_time = 0
     current_jump_avg_vel = 0
-    kp = 300
-    kd = 30
+    kp = 3
+    kd = 3
     
     # Joule heating constant
     kt = 0.0955
@@ -236,9 +236,10 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
                 # Apply Control Torques
                 hip_left_torque = np.clip(hip_left_torque, -hip1_peak_torque, hip1_peak_torque)
                 hip_right_torque = np.clip(hip_right_torque, -hip2_peak_torque, hip2_peak_torque)
-                
+                print(hip_left_torque, hip_right_torque)
                 d.ctrl[hip_left_actuator_id] = efficiency_left * hip_left_torque
                 d.ctrl[hip_right_actuator_id] = efficiency_right * hip_right_torque
+                #print(d.qpos[slide_z_dof])
 
                 
                 # Calculate energy for the current jump (starts from ground contact with positive velocity)
@@ -320,26 +321,26 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
                 best_duration,
                 jump_results
             )
-xml_path = "/home/stochlab/repo/optimal-design-legged-robots/xmls/design_xmls/8e295352.xml"   # <-- path to your XML
+xml_path = "/home/stochlab/repo/optimal-design-legged-robots/xmls/doggo_main.xml"   # <-- path to your XML
 
 # # # IK settings
-base_height = 0.3731016763707068
+base_height = 0.18
 foot_radius = 0.0
 
 ik_height = -(base_height - foot_radius) - 0.00
 #ik_height = -0.3
-thigh_length = 0.2718712948929698
-calf_length = 0.1770451334924181
-hip_offset = 0.0500674163906261*0.5
-efficiency_left = 0.942
-efficiency_right = 0.963
+thigh_length = 0.09
+calf_length = 0.16
+hip_offset = 0.05*0.5
+efficiency_left = 1.0
+efficiency_right = 1.0
 # Torque limit
-hip2_peak_torque = 4.000354855714441*2.304
-hip1_peak_torque = 2.292*7.249979475775106
+hip2_peak_torque = 1.5
+hip1_peak_torque = 1.5
 
 # Spring-damper-torsion gains
 # [linear_kp, linear_kd, rotational_kp]
-action = np.array([571.8, 7.5, 34.3])
+action = np.array([80, 7.5, 34.3])
 
 results = run(xml_path, action, ik_value=ik_height, hip1_peak_torque=hip1_peak_torque,
     hip2_peak_torque=hip2_peak_torque, thigh_length=thigh_length,
