@@ -301,7 +301,7 @@ ik_height = 0.45
 thigh_length = 0.297
 calf_length = 0.302
 torso_distance = 0.125
-motor_left_index = 5
+motor_left_index = 2
 motor_right_index = 2
 
 motor_left_name = motor_index_to_name(motor_left_index)
@@ -339,7 +339,7 @@ unique_id = uuid.uuid4().hex[:8]
 
 modify_5bar_xml(
     xml_file="/home/stochlab/repo/optimal-design-legged-robots/xmls/design_xmls/8778abeb.xml",
-    output_file="/home/stochlab/repo/optimal-design-legged-robots/xmls/5bar_baseline.xml",
+    output_file="/home/stochlab/repo/optimal-design-legged-robots/xmls/5bar_baseline_2.xml",
     base_height=ik_height,
     l1=thigh_length,
     l2=calf_length,

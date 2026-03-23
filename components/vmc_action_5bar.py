@@ -99,13 +99,14 @@ class Controller:
 
         Fl = self.total_linear_force()
         F_lin = Fl * leg_dir
-
+        print("Fl:", Fl, "F_lin:", F_lin)
         alpha = np.arctan2(leg_dir[0], -leg_dir[2])
         tau_t = self.T_gain * (self.ori_theta - alpha)
 
         leg_perp = np.array([-leg_dir[2], 0.0, leg_dir[0]])
         F_tor = (tau_t / l) * leg_perp
-
+        print("alpha:", alpha, "tau_t:", tau_t, "F_tor:", F_tor)
+        #print("X torque:", F_tor[0], "Y torque:", F_tor[1], "Z torque:", F_tor[2])
         return -F_lin - F_tor
 
     # ---------------------------------------------------
@@ -174,7 +175,7 @@ class Controller:
         Jp = 0.5 * (Jp_left + Jp_right)
 
         F = self.force_world()
-
+        #print("X force:", F[0], "Y force:", F[1], "Z force:", F[2])
         tau_full = Jp.T @ F
 
         tau_left = tau_full[self.hip_left_dof]
