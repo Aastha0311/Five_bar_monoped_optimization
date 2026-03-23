@@ -47,7 +47,7 @@ def fk_2r(q1, q2, l1, l2):
 # -------------------------
 # 5-bar IK
 # -------------------------
-def ik_5bar(x, z, l1, l2, l3, l4, hip_offset):
+def ik_5bar(x, z, l1, l2, hip_offset):
 
     # left hip at -offset
     q1_l, q2_l = ik_2r(
@@ -62,8 +62,8 @@ def ik_5bar(x, z, l1, l2, l3, l4, hip_offset):
     q1_r, q2_r = ik_2r(
         x - hip_offset,
         z,
-        l3,
-        l4,
+        l1,
+        l2,
         elbow=-1
     )
 

@@ -19,7 +19,7 @@ import old_rcp_5bar_wovideo as rcp
 import json 
 # Define the coefficient sets
 coefficient_sets = []
-for first_coeff in np.arange(0.3, 0.9, 0.05):  # 0.4 to 0.8 with step 0.05
+for first_coeff in np.arange(0.9, 0.3, -0.05):  # 0.4 to 0.8 with step 0.05
     second_coeff = 1.0 - first_coeff
     coefficient_sets.append((first_coeff, second_coeff))
 
@@ -36,20 +36,20 @@ for coeff_set in coefficient_sets:
     for seed in seed_list:
         print(f"\n\n========== Running optimization for SEED = {seed} ==========\n")
 
-        xml_template = "/home/stochlab/repo/optimal-design-legged-robots/xmls/5bar_base.xml"
+        xml_template = "/home/stochlab/repo/optimal-design-legged-robots/xmls/5bar_baseline.xml"
           
         date_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         
         # Update filenames to include coefficient values
-        best_results_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/gear/best_gear_25_{coeff_str}_{date_str}_{seed}.csv"
-        all_samples_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/gear/all_gear_25_{coeff_str}_{date_str}_{seed}.csv"
+        best_results_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/gear/no_landing_20_all/best_gear_20_{coeff_str}_{date_str}_{seed}.csv"
+        all_samples_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/gear/no_landing_20_all/all_gear_20_{coeff_str}_{date_str}_{seed}.csv"
         
         # Ensure directories exist
         os.makedirs(os.path.dirname(best_results_file), exist_ok=True)
         os.makedirs(os.path.dirname(all_samples_file), exist_ok=True)
         
         original_bounds = np.array([
-             #ik height
+            [0.3, 0.6], #ik height
             [1,6], 
             [1,6],# Calf length
             [4, 60], 
@@ -221,7 +221,7 @@ for coeff_set in coefficient_sets:
             # -----------------------------
             # Link masses from interpolation
             # -----------------------------
-            thigh_mass = float(thigh_interp_func(l1))
+            thigh_mass = float(calf_interp_func(l1))
             calf_mass = float(calf_interp_func(l2))
             # print(f"Interpolated thigh mass for length {l1:.3f} m: {thigh_mass:.3f} kg")
             # print(f"Interpolated calf mass for length {l2:.3f} m: {calf_mass:.3f} kg")
@@ -367,17 +367,17 @@ for coeff_set in coefficient_sets:
                 thigh_length = 0.297
                 calf_length = 0.302
                 torso_distance = 0.125
-                ik_height = 0.35
+                ik_height = params[0]
                 max_reach = thigh_length + calf_length
                 min_reach = abs(thigh_length - calf_length)
                 ik_height = np.clip(ik_height, min_reach, max_reach-0.01)
-                motor_left_name = motor_index_to_name(params[0])
-                motor_right_name = motor_index_to_name(params[1])
+                motor_left_name = motor_index_to_name(params[1])
+                motor_right_name = motor_index_to_name(params[2])
 
-                gear_left_ratio = params[2]
-                gear_right_ratio = params[3]
+                gear_left_ratio = params[3]
+                gear_right_ratio = params[4]
 
-                controller_params = process_action(params[4:])
+                controller_params = process_action(params[5:])
 
                 mass_left, efficiency_left, gearbox_left = get_motor_gearbox_properties(
                     "/home/stochlab/repo/optimal_gearbox_selection.csv",
@@ -488,7 +488,7 @@ for coeff_set in coefficient_sets:
                 # COST
                 # -------------------------
 
-                cost = coeff1 * (-best_distance * 25) + coeff2 * (best_energy)
+                cost = coeff1 * (-best_distance * 20) + coeff2 * (best_energy)
 
                 # -------------------------
                 # SAVE ALL RUNS
@@ -507,7 +507,7 @@ for coeff_set in coefficient_sets:
                             gearbox_left, gearbox_right, efficiency_left, efficiency_right,
                             torso_distance,ik_height, r["xvel"], r["energy"],
                             r["height"], r["distance"],
-                            unique_id
+                            unique_id, cost,
                         ] + list(controller_params))
 
                 return cost
@@ -521,12 +521,12 @@ for coeff_set in coefficient_sets:
             
 
         # CMA-ES Optimization
-        x0 = normalize(np.array([3, 4, 10.0, 10.0, 550, 5, 30]))
+        x0 = normalize(np.array([0.35, 3, 4, 10.0, 10.0, 550, 5, 30]))
         sigma0 = 0.1
         opts = cma.CMAOptions()
         opts.set({
             'maxiter': 1000, 'popsize': 8, 'seed': int(seed),
-            'bounds': [np.zeros(7), np.ones(7)], 'verb_disp': 1000, 'verb_disp': 1})
+            'bounds': [np.zeros(8), np.ones(8)], 'verb_disp': 1000, 'verb_disp': 1})
             # 'tolfun': 0,
             # 'tolfunhist': 0,
             # 'tolx': 0,
@@ -544,7 +544,7 @@ for coeff_set in coefficient_sets:
 
         with open(all_samples_file, "a", newline="") as file:
             writer = csv.writer(file)
-            writer.writerow(["Thigh", "Calf", "Hip left motor", "Hip right motor", "Hip left ratio", "Hip right ratio", "Gearbox left", "Gearbox right", "Efficiency left", "Efficiency right", "Torso distance", "ik_height", "Best X velocity", "Average energy", "Max height", "Max distance", "Unique id"] + [f"ac{i+1}" for i in range(3)])
+            writer.writerow(["Thigh", "Calf", "Hip left motor", "Hip right motor", "Hip left ratio", "Hip right ratio", "Gearbox left", "Gearbox right", "Efficiency left", "Efficiency right", "Torso distance", "ik_height", "Best X velocity", "Average energy", "Max height", "Max distance", "Unique id", "Cost"] + [f"ac{i+1}" for i in range(3)])
 
         if __name__ == "__main__":
 
@@ -569,18 +569,18 @@ for coeff_set in coefficient_sets:
                 thigh_length = 0.297
                 calf_length = 0.302
                 torso_distance = 0.125
-                ik_height = 0.35
+                ik_height = best_params[0]
 
-                motor1_number = best_params[0]
-                motor2_number = best_params[1]
+                motor1_number = best_params[1]
+                motor2_number = best_params[2]
 
                 motor_left_name = motor_index_to_name(motor1_number)
                 motor_right_name = motor_index_to_name(motor2_number)
 
-                gear_left_ratio = best_params[2]
-                gear_right_ratio = best_params[3]
+                gear_left_ratio = best_params[3]
+                gear_right_ratio = best_params[4]
 
-                controller_params = process_action(best_params[4:])
+                controller_params = process_action(best_params[5:])
 
                 mass_left, efficiency_left, gearbox_left = get_motor_gearbox_properties(
                     "/home/stochlab/repo/optimal_gearbox_selection.csv",

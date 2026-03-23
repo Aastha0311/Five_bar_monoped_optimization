@@ -22,7 +22,7 @@ import json
 
 # Define the coefficient sets
 coefficient_sets = []
-for first_coeff in np.arange(0.30, 0.90, 0.05):  # 0.4 to 0.8 with step 0.05
+for first_coeff in np.arange(0.90, 0.30, -0.05):  # 0.4 to 0.8 with step 0.05
     second_coeff = 1.0 - first_coeff
     coefficient_sets.append((first_coeff, second_coeff))
 

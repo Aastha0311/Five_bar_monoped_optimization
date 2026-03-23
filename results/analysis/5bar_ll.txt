@@ -1,0 +1,346 @@
+results with 20 coeff, land stop
+
+Primary CSV - Entry with Lowest Best Cost:
+
+thigh_length: 0.3443009724733337
+calf_length: 0.3337750533534025
+motor_left_name: nan
+motor_right_name: nan
+gear_left_ratio: 6.0
+gear_right_ratio: 6.0
+gearbox_left: nan
+gearbox_right: nan
+torso_distance: 0.0779028950421032
+ik_height: 0.3000011841791175
+best_index: 7.0
+best_cost: -9.655465298872004
+ac1: 558.6
+ac2: 8.0
+ac3: 33.3
+
+Matching Entry/Entries from Secondary CSV:
+
+Thigh: 0.3443009749113643
+Calf: 0.3337750575158353
+Hip left motor: VT8020
+Hip right motor: U10
+Hip left ratio: 6.0
+Hip right ratio: 6.0
+Gearbox left: SSPG
+Gearbox right: SSPG
+Efficiency left: 0.952
+Efficiency right: 0.952
+Torso distance: 0.0779028769684528
+ik_height: 0.3000011702873667
+Best X velocity: 9.157490728806044
+Average energy: 33.4829289882569
+Max height: 0.4541730575938213
+Max distance: 0.7224308573680986
+Unique id: 2f0ccc92
+Cost: -9.655462533800089
+ac1: 558.6
+ac2: 8.0
+ac3: 33.3
+
+----------------------------------------
+Primary CSV - Entry with Lowest Best Cost:
+
+thigh_length: 0.337009749303474
+calf_length: 0.3039304310171573
+motor_left_name: nan
+motor_right_name: nan
+gear_left_ratio: 6.0
+gear_right_ratio: 6.0
+gearbox_left: nan
+gearbox_right: nan
+torso_distance: 0.0500022772555008
+ik_height: 0.300017292963355
+best_index: 7.0
+best_cost: -7.669114584905378
+ac1: 977.8
+ac2: 0.3
+ac3: 19.2
+
+Matching Entry/Entries from Secondary CSV:
+
+Thigh: 0.337009681228884
+Calf: 0.3039303347929634
+Hip left motor: VT8020
+Hip right motor: U10
+Hip left ratio: 6.0
+Hip right ratio: 6.0
+Gearbox left: SSPG
+Gearbox right: SSPG
+Efficiency left: 0.952
+Efficiency right: 0.952
+Torso distance: 0.0500022789023548
+ik_height: 0.3000172693917053
+Best X velocity: 10.342206683773872
+Average energy: 30.34222765315653
+Max height: 0.4003373132369138
+Max distance: 0.7188496248071863
+Unique id: 63360502
+Cost: -7.669109473748685
+ac1: 977.8
+ac2: 0.3
+ac3: 19.2
+
+----------------------------------------
+Primary CSV - Entry with Lowest Best Cost:
+
+thigh_length: 0.3235012542427286
+calf_length: 0.2815290766580386
+motor_left_name: nan
+motor_right_name: nan
+gear_left_ratio: 6.0
+gear_right_ratio: 6.0
+gearbox_left: nan
+gearbox_right: nan
+torso_distance: 0.0542116397089459
+ik_height: 0.3001174805146553
+best_index: 7.0
+best_cost: -5.660341781251304
+ac1: 171.3
+ac2: 3.3
+ac3: 16.1
+
+Matching Entry/Entries from Secondary CSV:
+
+Thigh: 0.3235017161172555
+Calf: 0.2815288149263705
+Hip left motor: VT8020
+Hip right motor: U10
+Hip left ratio: 6.0
+Hip right ratio: 6.0
+Gearbox left: SSPG
+Gearbox right: SSPG
+Efficiency left: 0.952
+Efficiency right: 0.952
+Torso distance: 0.0542116170960879
+ik_height: 0.300118835348615
+Best X velocity: 10.140071355753596
+Average energy: 28.25585655171244
+Max height: 0.340023830420478
+Max distance: 0.7069660774109261
+Unique id: 534044e5
+Cost: -5.660285928232326
+ac1: 171.3
+ac2: 3.3
+ac3: 16.1
+
+----------------------------------------
+Primary CSV - Entry with Lowest Best Cost:
+
+thigh_length: 0.3061953021578432
+calf_length: 0.1982365103499699
+motor_left_name: nan
+motor_right_name: nan
+gear_left_ratio: 6.0
+gear_right_ratio: 6.0
+gearbox_left: nan
+gearbox_right: nan
+torso_distance: 0.0501702412971335
+ik_height: 0.322472944741533
+best_index: 4.0
+best_cost: -0.9489679024513976
+ac1: 447.4
+ac2: 0.0
+ac3: 26.1
+
+Matching Entry/Entries from Secondary CSV:
+
+Thigh: 0.3061953021578432
+Calf: 0.1982365103499699
+Hip left motor: VT8020
+Hip right motor: U10
+Hip left ratio: 6.0
+Hip right ratio: 6.0
+Gearbox left: SSPG
+Gearbox right: SSPG
+Efficiency left: 0.952
+Efficiency right: 0.952
+Torso distance: 0.0501702412971335
+ik_height: 0.322472944741533
+Best X velocity: 7.365700426989895
+Average energy: 27.494495907203948
+Max height: 0.1894154596674412
+Max distance: 0.5215061252834926
+Unique id: d485574d
+Cost: -0.9489679024513976
+ac1: 447.4
+ac2: 0.0
+ac3: 26.1
+
+----------------------------------------
+Primary CSV - Entry with Lowest Best Cost:
+
+thigh_length: 0.34592822236673
+calf_length: 0.1897773173439514
+motor_left_name: nan
+motor_right_name: nan
+gear_left_ratio: 6.0
+gear_right_ratio: 6.0
+gearbox_left: nan
+gearbox_right: nan
+torso_distance: 0.0767438366345943
+ik_height: 0.3856130776675529
+best_index: 1.0
+best_cost: -1.463564479592331
+ac1: 356.7
+ac2: 5.0
+ac3: 49.6
+
+Matching Entry/Entries from Secondary CSV:
+
+Thigh: 0.34592822236673
+Calf: 0.1897773173439514
+Hip left motor: VT8020
+Hip right motor: U10
+Hip left ratio: 6.0
+Hip right ratio: 6.0
+Gearbox left: SSPG
+Gearbox right: SSPG
+Efficiency left: 0.952
+Efficiency right: 0.952
+Torso distance: 0.0767438366345943
+ik_height: 0.3856130776675529
+Best X velocity: 7.662449920347266
+Average energy: 16.2859160866361
+Max height: 0.0255651739404432
+Max distance: 0.4535242361130832
+Unique id: 30693fb4
+Cost: -1.463564479592331
+ac1: 356.7
+ac2: 5.0
+ac3: 49.6
+
+----------------------------------------
+Primary CSV - Entry with Lowest Best Cost:
+
+thigh_length: 0.3228789329447148
+calf_length: 0.1825843418136429
+motor_left_name: nan
+motor_right_name: nan
+gear_left_ratio: 6.0
+gear_right_ratio: 6.0
+gearbox_left: nan
+gearbox_right: nan
+torso_distance: 0.1264040087165495
+ik_height: 0.3662913639006199
+best_index: 4.0
+best_cost: -1.9284990029438376
+ac1: 788.1
+ac2: 0.5
+ac3: 11.6
+
+Matching Entry/Entries from Secondary CSV:
+
+Thigh: 0.3228789329447148
+Calf: 0.1825843418136429
+Hip left motor: VT8020
+Hip right motor: U10
+Hip left ratio: 6.0
+Hip right ratio: 6.0
+Gearbox left: SSPG
+Gearbox right: SSPG
+Efficiency left: 0.952
+Efficiency right: 0.952
+Torso distance: 0.1264040087165495
+ik_height: 0.3662913639006199
+Best X velocity: 5.908784086811711
+Average energy: 9.22957759607759
+Max height: -0.0006165880549204
+Max distance: 0.3968347047362305
+Unique id: f403c677
+Cost: -1.9284990029438376
+ac1: 788.1
+ac2: 0.5
+ac3: 11.6
+
+----------------------------------------
+Primary CSV - Entry with Lowest Best Cost:
+
+thigh_length: 0.3498297957648792
+calf_length: 0.1500160542631619
+motor_left_name: nan
+motor_right_name: nan
+gear_left_ratio: 6.0
+gear_right_ratio: 6.0
+gearbox_left: nan
+gearbox_right: nan
+torso_distance: 0.1136805233121952
+ik_height: 0.4322655223329505
+best_index: 0.0
+best_cost: 1.6829238565642148
+ac1: 440.5
+ac2: 3.7
+ac3: 21.4
+
+Matching Entry/Entries from Secondary CSV:
+
+Thigh: 0.3498297957648792
+Calf: 0.1500160542631619
+Hip left motor: VT8020
+Hip right motor: U10
+Hip left ratio: 6.0
+Hip right ratio: 6.0
+Gearbox left: SSPG
+Gearbox right: SSPG
+Efficiency left: 0.952
+Efficiency right: 0.952
+Torso distance: 0.1136805233121952
+ik_height: 0.4322655223329505
+Best X velocity: 1.8936046489592229
+Average energy: 5.835515533553541
+Max height: 0.11946917442478
+Max distance: 0.0542735297381002
+Unique id: a774501c
+Cost: 1.6829238565642148
+ac1: 440.5
+ac2: 3.7
+ac3: 21.4
+
+----------------------------------------
+Primary CSV - Entry with Lowest Best Cost:
+
+thigh_length: 0.3499122940183629
+calf_length: 0.15000000286088
+motor_left_name: nan
+motor_right_name: nan
+gear_left_ratio: 6.0
+gear_right_ratio: 6.0
+gearbox_left: nan
+gearbox_right: nan
+torso_distance: 0.1434776972933641
+ik_height: 0.4363462368183786
+best_index: 4.0
+best_cost: 2.005985364249225
+ac1: 593.6
+ac2: 0.2
+ac3: 34.4
+
+Matching Entry/Entries from Secondary CSV:
+
+Thigh: 0.3499122940183629
+Calf: 0.15000000286088
+Hip left motor: VT8020
+Hip right motor: U10
+Hip left ratio: 6.0
+Hip right ratio: 6.0
+Gearbox left: SSPG
+Gearbox right: SSPG
+Efficiency left: 0.952
+Efficiency right: 0.952
+Torso distance: 0.1434776972933641
+ik_height: 0.4363462368183786
+Best X velocity: 1.8038685751940828
+Average energy: 5.684976056729458
+Max height: 0.1169167410440505
+Max distance: 0.0502048964799121
+Unique id: d63a9cb3
+Cost: 2.005985364249225
+ac1: 593.6
+ac2: 0.2
+ac3: 34.4
+
+----------------------------------------

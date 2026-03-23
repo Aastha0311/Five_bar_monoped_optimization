@@ -20,12 +20,12 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
     m = mj.MjModel.from_xml_path(xml_path)
     d = mj.MjData(m)
 
-    m.opt.iterations = 50  
+    m.opt.iterations = 500 
     m.opt.tolerance = 1e-6
 
     record_video = True
-    video_filename = "5bar_best_6337_20.mp4"
-    video_fps = 10
+    video_filename = "5bar_verify4.mp4"
+    video_fps = 100
     if record_video:
         renderer = mj.Renderer(m, width=1920, height=1080)
         frames = []
@@ -78,8 +78,8 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
     tracking_jump = False
     # hip_actuator_id = m.actuator('torque1').id    
     # knee_actuator_id = m.actuator('torque2').id    
-    l1n = thigh_length
-    l2n = calf_length
+    # l1n = thigh_length
+    # l2n = calf_length
 
 
     # theta1, theta2 = ik.inverse_kinematics(0, ik_value, l1n, l2n)
@@ -100,8 +100,8 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
     current_jump_start_x = 0
     current_jump_start_time = 0
     current_jump_avg_vel = 0
-    kp = 3
-    kd = 3
+    kp = 300
+    kd = 30
     
     # Joule heating constant
     kt = 0.0955
@@ -135,7 +135,8 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
                     forces = np.array([0, 0, 0])  
                     if len(contact_force) > 0:
                         forces = contact_force[0][0]
-                    
+                        #print("Contact forces:", forces, jump_count, d.qvel[slide_z_dof], jump_phase)
+                        
                     # Get current base velocity
                     current_base_vel = d.qvel[slide_z_dof]
                     on_ground = not np.all(forces == 0)
@@ -158,8 +159,10 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
                             # Landing phase: negative velocity while landing
                             jump_phase = "landing"
                         
-                        elif jump_started and jump_phase == "landing" and current_base_vel >= 0:
+                        #elif jump_started and jump_phase == "landing" and current_base_vel >= 0:
+                        elif jump_started and jump_phase == "landing":
                             # Jump completed, record results
+                            #
                             jump_count += 1
                             current_jump_x_end = d.qpos[slide_x_dof]
                             jump_z_end = d.qpos[slide_z_dof]
@@ -188,8 +191,8 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
                             current_jump_max_z = float('-inf')
                             
                             # Break if we've reached 3 jumps
-                            if jump_count >= 3:
-                                break
+                            # if jump_count >= 1:
+                            #     exit(0)
                         
                         # Apply controller forces when on ground and jump started
                         if jump_started:
@@ -236,14 +239,14 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
                 # Apply Control Torques
                 hip_left_torque = np.clip(hip_left_torque, -hip1_peak_torque, hip1_peak_torque)
                 hip_right_torque = np.clip(hip_right_torque, -hip2_peak_torque, hip2_peak_torque)
-                print(hip_left_torque, hip_right_torque)
+                #print(hip_left_torque, hip_right_torque)
                 d.ctrl[hip_left_actuator_id] = efficiency_left * hip_left_torque
                 d.ctrl[hip_right_actuator_id] = efficiency_right * hip_right_torque
                 #print(d.qpos[slide_z_dof])
 
                 
                 # Calculate energy for the current jump (starts from ground contact with positive velocity)
-                if jump_started and t_elapsed >= 0:
+                if jump_started and t_elapsed >= 0 and on_ground and current_base_vel > 0 and jump_phase != "landing" and jump_started:
                     # Mechanical energy (work done by actuators)
                     ha1 = m.opt.timestep * efficiency_left*hip_left_torque * d.qvel[hip_left_dof]            
                     ha2 = m.opt.timestep * efficiency_right*hip_right_torque * d.qvel[hip_right_dof]
@@ -321,29 +324,31 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
                 best_duration,
                 jump_results
             )
-xml_path = "/home/stochlab/repo/optimal-design-legged-robots/xmls/doggo_main.xml"   # <-- path to your XML
+xml_path = "/home/stochlab/repo/optimal-design-legged-robots/xmls/design_xmls/8be8aaf5.xml"   # <-- path to your XML
 
 # # # IK settings
-base_height = 0.18
-foot_radius = 0.0
-
-ik_height = -(base_height - foot_radius) - 0.00
-#ik_height = -0.3
-thigh_length = 0.09
-calf_length = 0.16
-hip_offset = 0.05*0.5
-efficiency_left = 1.0
-efficiency_right = 1.0
+ik_height = -0.3000489984219228
+thigh_length = 0.22967123006036
+calf_length = 0.2593131588827297
+hip_offset = 0.0509733082475869*0.5
+efficiency_left = 0.946
+efficiency_right = 0.963
 # Torque limit
-hip2_peak_torque = 1.5
-hip1_peak_torque = 1.5
+hip1_peak_torque = 7.049814878582689*4.966
+hip2_peak_torque = 4.008266458314754*2.304
+
 
 # Spring-damper-torsion gains
 # [linear_kp, linear_kd, rotational_kp]
-action = np.array([80, 7.5, 34.3])
+action = np.array([289.1, 6.8, 17.4])
+
+
+
+
+
 
 results = run(xml_path, action, ik_value=ik_height, hip1_peak_torque=hip1_peak_torque,
-    hip2_peak_torque=hip2_peak_torque, thigh_length=thigh_length,
+    hip2_peak_torque=hip2_peak_torque, thigh_length=thigh_length,    
     calf_length=calf_length,
     hip_offset=hip_offset, efficiency_left=efficiency_left, efficiency_right=efficiency_right)
 

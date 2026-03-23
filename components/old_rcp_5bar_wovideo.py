@@ -16,7 +16,7 @@ np.random.seed(0)
 random.seed(0)
 import mujoco.viewer
 
-def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_left_length, calf_left_length, thigh_right_length, calf_right_length, hip_offset, efficiency_left, efficiency_right):
+def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_length, calf_length, hip_offset, efficiency_left, efficiency_right):
     m = mj.MjModel.from_xml_path(xml_path)
     d = mj.MjData(m)
 
@@ -52,7 +52,7 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
     # -----------------------
     # Spawn from IK
     # -----------------------
-    q1_l, q2_l, q1_r, q2_r = ik.ik_5bar(0.0, ik_value, thigh_left_length, calf_left_length, thigh_right_length, calf_right_length, hip_offset)
+    q1_l, q2_l, q1_r, q2_r = ik.ik_5bar(0.0, ik_value, thigh_length, calf_length, hip_offset)
     d.qpos[m.joint("hip_left").qposadr[0]] = q1_l
     d.qpos[m.joint("knee_left").qposadr[0]] = q2_l
     d.qpos[m.joint("hip_right").qposadr[0]] = q1_r
@@ -153,7 +153,7 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
                     # Landing phase: negative velocity while landing
                     jump_phase = "landing"
                 
-                elif jump_started and jump_phase == "landing" and current_base_vel >= 0:
+                elif jump_started and jump_phase == "landing" :
                     # Jump completed, record results
                     jump_count += 1
                     current_jump_x_end = d.qpos[slide_x_dof]
@@ -321,26 +321,27 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
         best_duration,
         jump_results
     )
-# xml_path = "/home/stochlab/repo/optimal-design-legged-robots/xmls/design_xmls/8778abeb.xml"   # <-- path to your XML
+# xml_path = "/home/stochlab/repo/optimal-design-legged-robots/xmls/5bar_baseline.xml"   # <-- path to your XML
 
 # # # # IK settings
-# ik_height = -0.4203276682254768
-# thigh_length = 0.3046289869522943
-# calf_length = 0.190030742101534
-# hip_offset = 0.0500076970975257*0.5
-# efficiency_left = 0.963
-# efficiency_right = 0.939
+# ik_height = -0.45
+# thigh_length = 0.25
+# calf_length = 0.25
+# hip_offset = 0.125*0.5
+# efficiency_left = 0.952
+# efficiency_right = 0.952
 # # Torque limit
-# hip2_peak_torque = 9.04999755345784*2.304
-# hip1_peak_torque = 2.292*4.000092005818691
+# hip1_peak_torque = 19.636409554723574 
+# hip2_peak_torque = 21.818232838581746 
+
 
 # # Spring-damper-torsion gains
 # # [linear_kp, linear_kd, rotational_kp]
-# action = np.array([357.6, 9.9,29.1])
+# action = np.array([550,5,30])
 
 
 # results = run(xml_path, action, ik_value=ik_height, hip1_peak_torque=hip1_peak_torque,
-#     hip2_peak_torque=hip2_peak_torque, thigh_length=thigh_length,
+#     hip2_peak_torque=hip2_peak_torque, thigh_length=thigh_length,    
 #     calf_length=calf_length,
 #     hip_offset=hip_offset, efficiency_left=efficiency_left, efficiency_right=efficiency_right)
 

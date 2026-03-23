@@ -134,14 +134,15 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
                     mj.mj_step(m, d)
                     viewer.sync()
 
-xml_path = '/home/stochlab/repo/optimal-design-legged-robots/xmls/design_xmls/8778abeb.xml'
+xml_path = '/home/stochlab/repo/optimal-design-legged-robots/xmls/5bar_baseline.xml'
 action = None
-ik_value = -0.4203276682254768
-hip1_peak_torque = 4.000092005818691*2.292
-hip2_peak_torque = 9.04999755345784*2.304
-thigh_length = 0.3046289869522943
-calf_length = 0.190030742101534
-hip_offset = 0.0500076970975257*0.5
-efficiency_left = 0.963
-efficiency_right = 0.939
-run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_length, calf_length, hip_offset, efficiency_left, efficiency_right)
+ik_height = -0.45
+thigh_length = 0.25
+calf_length = 0.25
+hip_offset = 0.125*0.5
+efficiency_left = 0.952
+efficiency_right = 0.952
+# Torque limit
+hip1_peak_torque = 19.636409554723574 
+hip2_peak_torque = 21.818232838581746 
+run(xml_path, action, ik_height, hip1_peak_torque, hip2_peak_torque, thigh_length, calf_length, hip_offset, efficiency_left, efficiency_right)
