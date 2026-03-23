@@ -313,13 +313,13 @@ gear_right_ratio = 6.0
 
 
 mass_left_actuator, efficiency_left_actuator, gearbox_left = get_motor_gearbox_properties(
-    "/home/stochlab/repo/optimal_gearbox_selection.csv",
+    "/home/stochlab/repo/optimal-design-legged-robots/results/optimal_gearbox_selection.csv",
     motor_left_name,
     gear_left_ratio
 )
 
 mass_right_actuator, efficiency_right_actuator, gearbox_right = get_motor_gearbox_properties(
-    "/home/stochlab/repo/optimal_gearbox_selection.csv",
+    "/home/stochlab/repo/optimal-design-legged-robots/results/optimal_gearbox_selection.csv",
     motor_right_name,
     gear_right_ratio
 )
@@ -339,7 +339,7 @@ unique_id = uuid.uuid4().hex[:8]
 
 modify_5bar_xml(
     xml_file="/home/stochlab/repo/optimal-design-legged-robots/xmls/design_xmls/8778abeb.xml",
-    output_file="/home/stochlab/repo/optimal-design-legged-robots/xmls/5bar_baseline_2.xml",
+    output_file="/home/stochlab/repo/optimal-design-legged-robots/xmls/5bar_baseline_new.xml",
     base_height=ik_height,
     l1=thigh_length,
     l2=calf_length,

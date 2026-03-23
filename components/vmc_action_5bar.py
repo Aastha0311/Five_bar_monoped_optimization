@@ -99,15 +99,18 @@ class Controller:
 
         Fl = self.total_linear_force()
         F_lin = Fl * leg_dir
-        print("Fl:", Fl, "F_lin:", F_lin)
+        #print("Fl:", Fl, "F_lin:", F_lin)
         alpha = np.arctan2(leg_dir[0], -leg_dir[2])
         tau_t = self.T_gain * (self.ori_theta - alpha)
 
         leg_perp = np.array([-leg_dir[2], 0.0, leg_dir[0]])
         F_tor = (tau_t / l) * leg_perp
-        print("alpha:", alpha, "tau_t:", tau_t, "F_tor:", F_tor)
+        #print("alpha:", alpha, "tau_t:", tau_t, "F_tor:", F_tor)
         #print("X torque:", F_tor[0], "Y torque:", F_tor[1], "Z torque:", F_tor[2])
-        return -F_lin - F_tor
+        F = -F_lin - F_tor
+        total_mass = float(np.sum(self.m.body_mass))
+        F_grav = -total_mass * self.m.opt.gravity
+        return F + F_grav
 
     # ---------------------------------------------------
     # Ground contact
@@ -177,7 +180,8 @@ class Controller:
         F = self.force_world()
         #print("X force:", F[0], "Y force:", F[1], "Z force:", F[2])
         tau_full = Jp.T @ F
-
+        print("full torque vector shape:", tau_full.shape)
+        #print("Full torque vector:", tau_full)
         tau_left = tau_full[self.hip_left_dof]
         tau_right = tau_full[self.hip_right_dof]
 
