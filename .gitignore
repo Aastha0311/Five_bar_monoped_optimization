@@ -1,7 +1,9 @@
 xmls/design_xmls
 xmls/gear_xmls
-xmls/ll_xmls
+xmls/Case_A_xmls
+xmls/Case_B_xmls
+xmls/Case_C_xmls
 xmls/stoch3_xmls
 xmls/2bar_xmls
 xmls/doggo_xmls
-xmls/baseline_xmls
+xmls/Nominal_xmls

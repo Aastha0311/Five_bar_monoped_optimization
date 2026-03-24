@@ -19,7 +19,7 @@ import opt_codesign_5bar as rcp
 import json 
 # Define the coefficient sets
 coefficient_sets = []
-for first_coeff in np.arange(0.60, 0.65, 0.05):  # 0.4 to 0.8 with step 0.05
+for first_coeff in np.arange(0.565, 0.615, 0.05):  # 0.4 to 0.8 with step 0.05
     second_coeff = 1.0 - first_coeff
     coefficient_sets.append((first_coeff, second_coeff))
 
@@ -29,7 +29,7 @@ num_seeds = len(seed_list)
 # Main loop for coefficient sets
 for coeff_set in coefficient_sets:
     coeff1, coeff2 = coeff_set
-    coeff_str = f"{int(coeff1*100):03d}_{int(coeff2*100):03d}"
+    coeff_str = f"{int(coeff1*1000):03d}_{int(coeff2*1000):03d}"
     
     print(f"\n\n========== Running optimization for COEFFICIENTS = {coeff1:.2f}, {coeff2:.2f} ==========\n")
     

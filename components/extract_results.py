@@ -4,9 +4,9 @@ import numpy as np
 #575,425
 #579,421
 # File paths
-primary_csv = '/home/stochlab/repo/optimal-design-legged-robots/results/planar/gear_001_35gr/best_gear_20_055_044_2026-03-24_16-43-05_5.0.csv'
-secondary_csv = '/home/stochlab/repo/optimal-design-legged-robots/results/planar/gear_001_35gr/all_gear_20_055_044_2026-03-24_16-43-05_5.0.csv'
-output_json = '/home/stochlab/repo/optimal-design-legged-robots/results/analysis/5bar_gear_35_001.json'
+primary_csv = '/home/stochlab/repo/optimal-design-legged-robots/results/CMAES_output/Case_C_Full_co_design/best_dist_20_5500_4500_2026-03-24_16-18-34_5.0.csv'
+secondary_csv = '/home/stochlab/repo/optimal-design-legged-robots/results/CMAES_output/Case_C_Full_co_design/all_dist_20_5500_4500_2026-03-24_16-18-34_5.0.csv'
+output_json = '/home/stochlab/repo/optimal-design-legged-robots/results/Opt_design_control_parameters/CaseC_full_codesign_opt.json'
 
 # Load primary CSV
 df1 = pd.read_csv(primary_csv)

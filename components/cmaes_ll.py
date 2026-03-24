@@ -15,11 +15,11 @@ import numpy as np
 from scipy.interpolate import interp1d
 import sys, os
 #sys.path.append("/home/stochlab/repo/Aastha_Coopt_Monoped/Monoped-optimization")
-import old_rcp_5bar_wovideo as rcp
+import opt_codesign_5bar as rcp
 import json 
 # Define the coefficient sets
 coefficient_sets = []
-for first_coeff in np.arange(0.9, 0.3, -0.05):  # 0.4 to 0.8 with step 0.05
+for first_coeff in np.arange(0.55, 0.6, 0.05):  # 0.4 to 0.8 with step 0.05
     second_coeff = 1.0 - first_coeff
     coefficient_sets.append((first_coeff, second_coeff))
 
@@ -36,13 +36,13 @@ for coeff_set in coefficient_sets:
     for seed in seed_list:
         print(f"\n\n========== Running optimization for SEED = {seed} ==========\n")
 
-        xml_template = "/home/stochlab/repo/optimal-design-legged-robots/xmls/5bar_baseline.xml"
+        xml_template = "/home/stochlab/repo/optimal-design-legged-robots/xmls/5bar_baseline_new.xml"
           
         date_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         
         # Update filenames to include coefficient values
-        best_results_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/ll/no_landing/best_ll_20_{coeff_str}_{date_str}_{seed}.csv"
-        all_samples_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/ll/no_landing/all_ll_20_{coeff_str}_{date_str}_{seed}.csv"
+        best_results_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/5bar_ll_001_200/best_ll_20_{coeff_str}_{date_str}_{seed}.csv"
+        all_samples_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/5bar_ll_001_200/all_ll_20_{coeff_str}_{date_str}_{seed}.csv"
         
         # Ensure directories exist
         os.makedirs(os.path.dirname(best_results_file), exist_ok=True)
@@ -52,11 +52,12 @@ for coeff_set in coefficient_sets:
             [0.15, 0.35],  # Thigh length
             [0.15, 0.35],
             [0.05, 0.15],
-            [0.3, 0.6],#ik height
-            
-            [50, 1000],    # Controller Param 1
-            [0, 10], 
-            [10, 50]# Controller Param        # Controller Param 6
+            [0.3, 0.6],  # ik height
+            [0, 10],  # ori_l
+            [-np.pi / 2, np.pi / 2],  # ori_theta
+            [50, 1000],  # Controller Param 1
+            [0, 10],
+            [10, 50]  # Controller Param 3
         ])
         import pandas as pd
 
@@ -364,12 +365,14 @@ for coeff_set in coefficient_sets:
                 calf_length = params[1]
                 torso_distance = params[2]
                 ik_height = params[3]
+                ori_l = params[4]
+                ori_theta = params[5]
                 max_reach = thigh_length + calf_length
                 min_reach = abs(thigh_length - calf_length)
                 ik_height = np.clip(ik_height, min_reach, max_reach-0.01)
                 # motor_left_name = motor_index_to_name(params[4])
                 # motor_right_name = motor_index_to_name(params[5])
-                motor_left_name = motor_index_to_name(5)
+                motor_left_name = motor_index_to_name(2)
                 motor_right_name = motor_index_to_name(2)
                 gear_left_ratio = 6.0
                 gear_right_ratio = 6.0
@@ -377,16 +380,16 @@ for coeff_set in coefficient_sets:
                 # gear_left_ratio = params[6]
                 # gear_right_ratio = params[7]
 
-                controller_params = process_action(params[4:])
+                controller_params = process_action(params[6:])
 
                 mass_left, efficiency_left, gearbox_left = get_motor_gearbox_properties(
-                    "/home/stochlab/repo/optimal_gearbox_selection.csv",
+                    "/home/stochlab/repo/optimal-design-legged-robots/results/optimal_gearbox_selection.csv",
                     motor_left_name,
                     gear_left_ratio
                 )
 
                 mass_right, efficiency_right, gearbox_right = get_motor_gearbox_properties(
-                    "/home/stochlab/repo/optimal_gearbox_selection.csv",
+                    "/home/stochlab/repo/optimal-design-legged-robots/results/optimal_gearbox_selection.csv",
                     motor_right_name,
                     gear_right_ratio
                 )
@@ -440,7 +443,9 @@ for coeff_set in coefficient_sets:
                         calf_length,
                         torso_distance*0.5,
                         efficiency_left,
-                        efficiency_right
+                        efficiency_right,
+                        ori_l,
+                        ori_theta
                     )
 
                     if result is None:
@@ -505,7 +510,7 @@ for coeff_set in coefficient_sets:
                             motor_left_name, motor_right_name,
                             gear_left_ratio, gear_right_ratio,
                             gearbox_left, gearbox_right, efficiency_left, efficiency_right,
-                            torso_distance,ik_height, r["xvel"], r["energy"],
+                            torso_distance, ik_height, ori_l, ori_theta, r["xvel"], r["energy"],
                             r["height"], r["distance"],
                             unique_id, cost,
                         ] + list(controller_params))
@@ -521,12 +526,12 @@ for coeff_set in coefficient_sets:
             
 
         # CMA-ES Optimization
-        x0 = normalize(np.array([0.25, 0.25, 0.1, 0.35, 550, 5, 30]))
+        x0 = normalize(np.array([0.25, 0.25, 0.1, 0.35, 5.0, 0.0, 550, 5, 30]))
         sigma0 = 0.1
         opts = cma.CMAOptions()
         opts.set({
-            'maxiter': 1000, 'popsize': 8, 'seed': int(seed),
-            'bounds': [np.zeros(7), np.ones(7)], 'verb_disp': 1000, 'verb_disp': 1})
+            'maxiter': 200, 'popsize': 8, 'seed': int(seed),
+            'bounds': [np.zeros(9), np.ones(9)], 'verb_disp': 1000, 'verb_disp': 1})
             # 'tolfun': 0,
             # 'tolfunhist': 0,
             # 'tolx': 0,
@@ -539,12 +544,12 @@ for coeff_set in coefficient_sets:
 
         with open(best_results_file, "a", newline="") as file:
             writer = csv.writer(file)
-            writer.writerow(["thigh_length", "calf_length", "motor_left_name", "motor_right_name", "gear_left_ratio", "gear_right_ratio", "gearbox_left", "gearbox_right", "torso_distance","ik_height", "best_index", "best_cost"] + [f"ac{i+1}" for i in range(3)])
+            writer.writerow(["thigh_length", "calf_length", "motor_left_name", "motor_right_name", "gear_left_ratio", "gear_right_ratio", "gearbox_left", "gearbox_right", "torso_distance", "ik_height", "ori_l", "ori_theta", "best_index", "best_cost"] + [f"ac{i+1}" for i in range(3)])
 
 
         with open(all_samples_file, "a", newline="") as file:
             writer = csv.writer(file)
-            writer.writerow(["Thigh", "Calf", "Hip left motor", "Hip right motor", "Hip left ratio", "Hip right ratio", "Gearbox left", "Gearbox right", "Efficiency left", "Efficiency right", "Torso distance", "ik_height", "Best X velocity", "Average energy", "Max height", "Max distance", "Unique id", "Cost"] + [f"ac{i+1}" for i in range(3)])
+            writer.writerow(["Thigh", "Calf", "Hip left motor", "Hip right motor", "Hip left ratio", "Hip right ratio", "Gearbox left", "Gearbox right", "Efficiency left", "Efficiency right", "Torso distance", "ik_height", "ori_l", "ori_theta", "Best X velocity", "Average energy", "Max height", "Max distance", "Unique id", "Cost"] + [f"ac{i+1}" for i in range(3)])
 
         if __name__ == "__main__":
 
@@ -566,10 +571,14 @@ for coeff_set in coefficient_sets:
                 calf_length = best_params[1]
                 torso_distance = best_params[2]
                 ik_height = best_params[3]
-
-                # motor1_number = best_params[4]
-                # motor2_number = best_params[5]
-                motor_left_name = motor_index_to_name(5)
+                max_reach = thigh_length + calf_length
+                min_reach = abs(thigh_length - calf_length)
+                ik_height = np.clip(ik_height, min_reach, max_reach-0.01)
+                ori_l = best_params[4]
+                ori_theta = best_params[5]
+                # motor1_number = best_params[6]
+                # motor2_number = best_params[7]
+                motor_left_name = motor_index_to_name(2)
                 motor_right_name = motor_index_to_name(2)
                 gear_left_ratio = 6.0
                 gear_right_ratio = 6.0
@@ -580,16 +589,16 @@ for coeff_set in coefficient_sets:
                 # gear_left_ratio = best_params[6]
                 # gear_right_ratio = best_params[7]
 
-                controller_params = process_action(best_params[4:])
+                controller_params = process_action(best_params[6:])
 
                 mass_left, efficiency_left, gearbox_left = get_motor_gearbox_properties(
-                    "/home/stochlab/repo/optimal_gearbox_selection.csv",
+                    "/home/stochlab/repo/optimal-design-legged-robots/results/optimal_gearbox_selection.csv",
                     motor_left_name,
                     gear_left_ratio
                 )
 
                 mass_right, efficiency_right, gearbox_right = get_motor_gearbox_properties(
-                    "/home/stochlab/repo/optimal_gearbox_selection.csv",
+                    "/home/stochlab/repo/optimal-design-legged-robots/results/optimal_gearbox_selection.csv",
                     motor_right_name,
                     gear_right_ratio
                 )
@@ -601,7 +610,7 @@ for coeff_set in coefficient_sets:
                         motor_left_name, motor_right_name,
                         gear_left_ratio, gear_right_ratio,
                         gearbox_left, gearbox_right,
-                        torso_distance, ik_height,
+                        torso_distance, ik_height, ori_l, ori_theta,
                         best_index, best_cost
                     ] + list(controller_params))
 
