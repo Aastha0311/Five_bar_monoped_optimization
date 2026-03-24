@@ -109,7 +109,8 @@ class Controller:
         #print("X torque:", F_tor[0], "Y torque:", F_tor[1], "Z torque:", F_tor[2])
         F = -F_lin - F_tor
         total_mass = float(np.sum(self.m.body_mass))
-        F_grav = -total_mass * self.m.opt.gravity
+        F_grav = 0*total_mass * self.m.opt.gravity
+        #print("total_mass:", total_mass, "gravity:", self.m.opt.gravity, "F_grav:", F_grav)
         return F + F_grav
 
     # ---------------------------------------------------
@@ -180,7 +181,7 @@ class Controller:
         F = self.force_world()
         #print("X force:", F[0], "Y force:", F[1], "Z force:", F[2])
         tau_full = Jp.T @ F
-        print("full torque vector shape:", tau_full.shape)
+        #print("full torque vector shape:", tau_full.shape)
         #print("Full torque vector:", tau_full)
         tau_left = tau_full[self.hip_left_dof]
         tau_right = tau_full[self.hip_right_dof]

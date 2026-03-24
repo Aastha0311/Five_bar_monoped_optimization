@@ -243,6 +243,7 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
                 #print(hip_left_torque, hip_right_torque)
                 d.ctrl[hip_left_actuator_id] = efficiency_left * hip_left_torque
                 d.ctrl[hip_right_actuator_id] = efficiency_right * hip_right_torque
+                print(efficiency_left * hip_left_torque, efficiency_right * hip_right_torque)
                 #print(d.qpos[slide_z_dof])
 
                 
@@ -347,7 +348,7 @@ def get_motor_continuous_torque(config_path, motor_name):
     return (9.55 / kv) * max_continuous_current
 
 
-results_json = "/home/stochlab/repo/optimal-design-legged-robots/results/analysis/5bar_ll.json"
+results_json = "/home/stochlab/repo/optimal-design-legged-robots/results/analysis/5bar_ll_2.json"
 with open(results_json, "r") as f:
     results_data = json.load(f)
 

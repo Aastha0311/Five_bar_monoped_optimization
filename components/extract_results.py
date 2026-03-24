@@ -1,11 +1,12 @@
 import json
 import pandas as pd
 import numpy as np
-
+#575,425
+#579,421
 # File paths
-primary_csv = '/home/stochlab/repo/optimal-design-legged-robots/results/5bar_planar_2/best_dist_20_055_044_2026-03-24_02-08-14_5.0.csv'
-secondary_csv = '/home/stochlab/repo/optimal-design-legged-robots/results/5bar_planar_2/all_dist_20_055_044_2026-03-24_02-08-14_5.0.csv'
-output_json = '/home/stochlab/repo/optimal-design-legged-robots/results/analysis/5bar_ll_2.json'
+primary_csv = '/home/stochlab/repo/optimal-design-legged-robots/results/planar/gear_001_35gr/best_gear_20_055_044_2026-03-24_16-43-05_5.0.csv'
+secondary_csv = '/home/stochlab/repo/optimal-design-legged-robots/results/planar/gear_001_35gr/all_gear_20_055_044_2026-03-24_16-43-05_5.0.csv'
+output_json = '/home/stochlab/repo/optimal-design-legged-robots/results/analysis/5bar_gear_35_001.json'
 
 # Load primary CSV
 df1 = pd.read_csv(primary_csv)

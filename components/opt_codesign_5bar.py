@@ -321,30 +321,30 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
         best_duration,
         jump_results
     )
-xml_path = "/home/stochlab/repo/optimal-design-legged-robots/xmls/baseline_xmls/75d7a6ed.xml"   # <-- path to your XML
+# xml_path = "/home/stochlab/repo/optimal-design-legged-robots/xmls/baseline_xmls/75d7a6ed.xml"   # <-- path to your XML
 
-# # # IK settings
-ik_height = -0.3
-thigh_length = 0.297
-calf_length = 0.302
-hip_offset = 0.125*0.5
-efficiency_left = 0.952
-efficiency_right = 0.952
-# Torque limit
-hip1_peak_torque = 6*3.82
-hip2_peak_torque = 6*3.438
+# # # # IK settings
+# ik_height = -0.3
+# thigh_length = 0.297
+# calf_length = 0.302
+# hip_offset = 0.125*0.5
+# efficiency_left = 0.952
+# efficiency_right = 0.952
+# # Torque limit
+# hip1_peak_torque = 6*3.82
+# hip2_peak_torque = 6*3.438
 
 
-# Spring-damper-torsion gains
-# [linear_kp, linear_kd, rotational_kp]
-action = np.array([74.6, 1.6, 49.7])
-results = run(xml_path, action, ik_value=ik_height, hip1_peak_torque=hip1_peak_torque,
-    hip2_peak_torque=hip2_peak_torque, thigh_length=thigh_length,    
-    calf_length=calf_length,
-    hip_offset=hip_offset, efficiency_left=efficiency_left, efficiency_right=efficiency_right)
+# # Spring-damper-torsion gains
+# # [linear_kp, linear_kd, rotational_kp]
+# action = np.array([74.6, 1.6, 49.7])
+# results = run(xml_path, action, ik_value=ik_height, hip1_peak_torque=hip1_peak_torque,
+#     hip2_peak_torque=hip2_peak_torque, thigh_length=thigh_length,    
+#     calf_length=calf_length,
+#     hip_offset=hip_offset, efficiency_left=efficiency_left, efficiency_right=efficiency_right)
 
-print("Best Jump Height: {:.4f} m".format(results[0]))
-print("Best Jump Forward Velocity: {:.4f} m/s".format(results[1]))
-print("Best Jump Distance: {:.4f} m".format(results[2]))
-print("Best Jump Energy: {:.4f} J".format(results[3]))
-print("Best Jump Duration: {:.4f} s".format(results[4]))
+# print("Best Jump Height: {:.4f} m".format(results[0]))
+# print("Best Jump Forward Velocity: {:.4f} m/s".format(results[1]))
+# print("Best Jump Distance: {:.4f} m".format(results[2]))
+# print("Best Jump Energy: {:.4f} J".format(results[3]))
+# print("Best Jump Duration: {:.4f} s".format(results[4]))

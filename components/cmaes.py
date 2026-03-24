@@ -19,7 +19,7 @@ import opt_codesign_5bar as rcp
 import json 
 # Define the coefficient sets
 coefficient_sets = []
-for first_coeff in np.arange(0.578, 0.58, 0.001):  # 0.4 to 0.8 with step 0.05
+for first_coeff in np.arange(0.55, 0.60, 0.05):  # 0.4 to 0.8 with step 0.05
     second_coeff = 1.0 - first_coeff
     coefficient_sets.append((first_coeff, second_coeff))
 
@@ -29,7 +29,7 @@ num_seeds = len(seed_list)
 # Main loop for coefficient sets
 for coeff_set in coefficient_sets:
     coeff1, coeff2 = coeff_set
-    coeff_str = f"{int(coeff1*1000):03d}_{int(coeff2*1000):03d}"
+    coeff_str = f"{int(coeff1*10000):03d}_{int(coeff2*10000):03d}"
     
     print(f"\n\n========== Running optimization for COEFFICIENTS = {coeff1:.2f}, {coeff2:.2f} ==========\n")
     
@@ -41,8 +41,8 @@ for coeff_set in coefficient_sets:
         date_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         
         # Update filenames to include coefficient values
-        best_results_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/5bar_planar_2/best_dist_20_{coeff_str}_{date_str}_{seed}.csv"
-        all_samples_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/5bar_planar_2/all_dist_20_{coeff_str}_{date_str}_{seed}.csv"
+        best_results_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/5bar_h_001_35gr/best_dist_20_{coeff_str}_{date_str}_{seed}.csv"
+        all_samples_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/5bar_h_001_35gr/all_dist_20_{coeff_str}_{date_str}_{seed}.csv"
         
         # Ensure directories exist
         os.makedirs(os.path.dirname(best_results_file), exist_ok=True)
@@ -57,8 +57,8 @@ for coeff_set in coefficient_sets:
             [-np.pi / 2, np.pi / 2],  # ori_theta
             [1, 6],
             [1, 6],
-            [4, 60],
-            [4, 60],
+            [4, 35],
+            [4, 35],
             [50, 1000],
             [0, 10],
             [10, 50]
@@ -448,7 +448,7 @@ for coeff_set in coefficient_sets:
                         ori_theta
                     )
 
-                    if result is None:
+                    if result is None :
                         continue
 
                     best_height, best_x_vel, best_distance, best_energy, best_duration, jump_results = result
@@ -464,7 +464,7 @@ for coeff_set in coefficient_sets:
                         "duration": best_duration
                     })
 
-                if len(run_results) == 0:
+                if len(run_results) == 0 or best_height<0.01 :
                     return 1e6
 
                 # -------------------------

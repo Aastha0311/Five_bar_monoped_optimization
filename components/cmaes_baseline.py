@@ -19,7 +19,7 @@ import opt_codesign_5bar as rcp
 import json 
 # Define the coefficient sets
 coefficient_sets = []
-for first_coeff in np.arange(0.95, 0.7, -0.05):  # 0.4 to 0.8 with step 0.05
+for first_coeff in np.arange(0.95, 1, 0.05):  # 0.4 to 0.8 with step 0.05
     second_coeff = 1.0 - first_coeff
     coefficient_sets.append((first_coeff, second_coeff))
 
@@ -41,8 +41,8 @@ for coeff_set in coefficient_sets:
         date_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         
         # Update filenames to include coefficient values
-        best_results_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/baseline/best_dist_20_{coeff_str}_{date_str}_{seed}.csv"
-        all_samples_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/planar/dist/baseline/all_dist_20_{coeff_str}_{date_str}_{seed}.csv"
+        best_results_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/baseline_h_001/best_dist_20_{coeff_str}_{date_str}_{seed}.csv"
+        all_samples_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/baseline_h_001/all_dist_20_{coeff_str}_{date_str}_{seed}.csv"
         
         # Ensure directories exist
         os.makedirs(os.path.dirname(best_results_file), exist_ok=True)
@@ -466,7 +466,7 @@ for coeff_set in coefficient_sets:
                         "duration": best_duration
                     })
 
-                if len(run_results) == 0:
+                if len(run_results) == 0 or best_height < 0.01:
                     return 1e6
 
                 # -------------------------
@@ -532,7 +532,7 @@ for coeff_set in coefficient_sets:
         sigma0 = 0.1
         opts = cma.CMAOptions()
         opts.set({
-            'maxiter': 1000, 'popsize': 8, 'seed': int(seed),
+            'maxiter': 200, 'popsize': 8, 'seed': int(seed),
             'bounds': [np.zeros(6), np.ones(6)], 'verb_disp': 1000, 'verb_disp': 1})
             # 'tolfun': 0,
             # 'tolfunhist': 0,
