@@ -17,6 +17,13 @@ import sys, os
 #sys.path.append("/home/stochlab/repo/Aastha_Coopt_Monoped/Monoped-optimization")
 import opt_codesign_5bar as rcp
 import json 
+
+BASE_DIR = os.path.dirname(__file__)
+REPO_DIR = os.path.abspath(os.path.join(BASE_DIR, ".."))
+RESULTS_DIR = os.path.join(REPO_DIR, "results")
+XMLS_DIR = os.path.join(REPO_DIR, "xmls")
+COMPONENTS_DIR = os.path.join(REPO_DIR, "components")
+ACT_OPT_DIR = os.path.join(REPO_DIR, "Actuator Optimization")
 # Define the coefficient sets
 coefficient_sets = []
 for first_coeff in np.arange(0.99, 1, 0.01):  # 0.4 to 0.8 with step 0.05
@@ -36,13 +43,20 @@ for coeff_set in coefficient_sets:
     for seed in seed_list:
         print(f"\n\n========== Running optimization for SEED = {seed} ==========\n")
 
-        xml_template = "/home/stochlab/repo/optimal-design-legged-robots/xmls/5bar_baseline_new.xml"
+        xml_template = os.path.join(XMLS_DIR, "5bar_baseline_new.xml")
           
         date_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         
         # Update filenames to include coefficient values
-        best_results_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/5bar_ll_001_200/best_ll_20_{coeff_str}_{date_str}_{seed}.csv"
-        all_samples_file = f"/home/stochlab/repo/optimal-design-legged-robots/results/5bar_ll_001_200/all_ll_20_{coeff_str}_{date_str}_{seed}.csv"
+        output_dir = os.path.join(RESULTS_DIR, "5bar_ll_001_200")
+        best_results_file = os.path.join(
+            output_dir,
+            f"best_ll_20_{coeff_str}_{date_str}_{seed}.csv",
+        )
+        all_samples_file = os.path.join(
+            output_dir,
+            f"all_ll_20_{coeff_str}_{date_str}_{seed}.csv",
+        )
         
         # Ensure directories exist
         os.makedirs(os.path.dirname(best_results_file), exist_ok=True)
@@ -135,7 +149,7 @@ for coeff_set in coefficient_sets:
 
             return mass, efficiency, gearbox
         # Helper Functions
-        dft = pd.read_csv('/home/stochlab/repo/optimal-design-legged-robots/components/thigh_15_35.csv')
+        dft = pd.read_csv(os.path.join(COMPONENTS_DIR, "thigh_15_35.csv"))
 
         # Sort by gear ratio to avoid interpolation issues
         dft = dft.sort_values(by='Link Length (mm)')
@@ -154,7 +168,7 @@ for coeff_set in coefficient_sets:
         )
 
 
-        dfc = pd.read_csv('/home/stochlab/repo/optimal-design-legged-robots/components/calf_15_35.csv')
+        dfc = pd.read_csv(os.path.join(COMPONENTS_DIR, "calf_15_35.csv"))
 
         # Sort by gear ratio to avoid interpolation issues
         dfc = dfc.sort_values(by='Link Length (mm)')
@@ -383,30 +397,30 @@ for coeff_set in coefficient_sets:
                 controller_params = process_action(params[6:])
 
                 mass_left, efficiency_left, gearbox_left = get_motor_gearbox_properties(
-                    "/home/stochlab/repo/optimal-design-legged-robots/results/optimal_gearbox_selection.csv",
+                    os.path.join(RESULTS_DIR, "optimal_gearbox_selection.csv"),
                     motor_left_name,
                     gear_left_ratio
                 )
 
                 mass_right, efficiency_right, gearbox_right = get_motor_gearbox_properties(
-                    "/home/stochlab/repo/optimal-design-legged-robots/results/optimal_gearbox_selection.csv",
+                    os.path.join(RESULTS_DIR, "optimal_gearbox_selection.csv"),
                     motor_right_name,
                     gear_right_ratio
                 )
 
                 tau_left = get_continuous_torque(
-                    "/home/stochlab/repo/optimal-design-legged-robots/Actuator Optimization/config_files/config.json",
+                    os.path.join(ACT_OPT_DIR, "config_files", "config.json"),
                     "Motor" + motor_left_name + "_framed"
                 ) * gear_left_ratio
 
                 tau_right = get_continuous_torque(
-                    "/home/stochlab/repo/optimal-design-legged-robots/Actuator Optimization/config_files/config.json",
+                    os.path.join(ACT_OPT_DIR, "config_files", "config.json"),
                     "Motor" + motor_right_name + "_framed"
                 ) * gear_right_ratio
 
                 unique_id = uuid.uuid4().hex[:8]
 
-                modified_xml = f"/home/stochlab/repo/optimal-design-legged-robots/xmls/ll_xmls/{unique_id}.xml"
+                modified_xml = os.path.join(XMLS_DIR, "ll_xmls", f"{unique_id}.xml")
 
                 modify_5bar_xml(
                     xml_template,
@@ -592,13 +606,13 @@ for coeff_set in coefficient_sets:
                 controller_params = process_action(best_params[6:])
 
                 mass_left, efficiency_left, gearbox_left = get_motor_gearbox_properties(
-                    "/home/stochlab/repo/optimal-design-legged-robots/results/optimal_gearbox_selection.csv",
+                    os.path.join(RESULTS_DIR, "optimal_gearbox_selection.csv"),
                     motor_left_name,
                     gear_left_ratio
                 )
 
                 mass_right, efficiency_right, gearbox_right = get_motor_gearbox_properties(
-                    "/home/stochlab/repo/optimal-design-legged-robots/results/optimal_gearbox_selection.csv",
+                    os.path.join(RESULTS_DIR, "optimal_gearbox_selection.csv"),
                     motor_right_name,
                     gear_right_ratio
                 )

@@ -4,7 +4,6 @@ import numpy as np
 import mujoco as mj
 import time
 import sys, os
-sys.path.append("/home/stochlab/repo/Aastha_Coopt_Monoped/Monoped-optimization")
 import utils.ik_5bar as ik
 import vmc_action_5bar as vmc_rp
 import imageio
@@ -18,26 +17,37 @@ np.random.seed(0)
 random.seed(0)
 import mujoco.viewer
 
+BASE_DIR = os.path.dirname(__file__)
+REPO_DIR = os.path.abspath(os.path.join(BASE_DIR, ".."))
+RESULTS_DIR = os.path.join(REPO_DIR, "results")
+XMLS_DIR = os.path.join(REPO_DIR, "xmls")
+OPT_PARAMS_DIR = os.path.join(RESULTS_DIR, "Opt_design_control_parameters")
+MONOPED_OPT_DIR = os.path.abspath(
+    os.path.join(REPO_DIR, "..", "Aastha_Coopt_Monoped", "Monoped-optimization")
+)
+if os.path.isdir(MONOPED_OPT_DIR):
+    sys.path.append(MONOPED_OPT_DIR)
+
 CASE = "Nominal"  # Choose: A, B, C, or Nominal
 RECORD_VIDEO = True
-VIDEO_DIR = "/home/stochlab/repo/optimal-design-legged-robots/results/videos"
+VIDEO_DIR = os.path.join(RESULTS_DIR, "videos")
 
 CASE_CHOICES = {
     "A": {
-        "results_json": "/home/stochlab/repo/optimal-design-legged-robots/results/Opt_design_control_parameters/CaseA_ll.json",
-        "xml_dir": "/home/stochlab/repo/optimal-design-legged-robots/xmls/Case_A_xmls",
+        "results_json": os.path.join(OPT_PARAMS_DIR, "CaseA_ll.json"),
+        "xml_dir": os.path.join(XMLS_DIR, "Case_A_xmls"),
     },
     "B": {
-        "results_json": "/home/stochlab/repo/optimal-design-legged-robots/results/Opt_design_control_parameters/CaseB_gear_opt.json",
-        "xml_dir": "/home/stochlab/repo/optimal-design-legged-robots/xmls/Case_B_xmls",
+        "results_json": os.path.join(OPT_PARAMS_DIR, "CaseB_gear_opt.json"),
+        "xml_dir": os.path.join(XMLS_DIR, "Case_B_xmls"),
     },
     "C": {
-        "results_json": "/home/stochlab/repo/optimal-design-legged-robots/results/Opt_design_control_parameters/CaseC_full_codesign_opt.json",
-        "xml_dir": "/home/stochlab/repo/optimal-design-legged-robots/xmls/Case_C_xmls",
+        "results_json": os.path.join(OPT_PARAMS_DIR, "CaseC_full_codesign_opt.json"),
+        "xml_dir": os.path.join(XMLS_DIR, "Case_C_xmls"),
     },
     "NOMINAL": {
-        "results_json": "/home/stochlab/repo/optimal-design-legged-robots/results/Opt_design_control_parameters/Nominal.json",
-        "xml_dir": "/home/stochlab/repo/optimal-design-legged-robots/xmls/Nominal_xmls",
+        "results_json": os.path.join(OPT_PARAMS_DIR, "Nominal.json"),
+        "xml_dir": os.path.join(XMLS_DIR, "Nominal_xmls"),
     },
 }
 
@@ -447,7 +457,7 @@ motor_right_name = get_field(secondary, "Hip right motor", "motor_right_name", "
 gear_left_ratio = float(get_field(secondary, "Hip left ratio", "gear_left_ratio", "gear_ratio_left"))
 gear_right_ratio = float(get_field(secondary, "Hip right ratio", "gear_right_ratio", "gear_ratio_right"))
 
-config_path = "/home/stochlab/repo/optimal-design-legged-robots/COMPAct/config_files/config.json"
+config_path = os.path.join(REPO_DIR, "Actuator Optimization", "config_files", "config.json")
 motor_left_key = f"Motor{motor_left_name}_framed"
 motor_right_key = f"Motor{motor_right_name}_framed"
 hip1_peak_torque = get_motor_continuous_torque(config_path, motor_left_key) * gear_left_ratio

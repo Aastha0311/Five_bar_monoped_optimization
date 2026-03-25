@@ -3,7 +3,6 @@ import numpy as np
 import mujoco as mj
 import time
 import sys, os
-#sys.path.append("/home/stochlab/repo/Aastha_Coopt_Monoped/Monoped-optimization")
 import utils.ik_5bar as ik
 import vmc_action_5bar as vmc_rp
 import imageio
@@ -18,23 +17,30 @@ random.seed(0)
 import mujoco.viewer
 import csv
 
+BASE_DIR = os.path.dirname(__file__)
+REPO_DIR = os.path.abspath(os.path.join(BASE_DIR, ".."))
+RESULTS_DIR = os.path.join(REPO_DIR, "results")
+XMLS_DIR = os.path.join(REPO_DIR, "xmls")
+OPT_PARAMS_DIR = os.path.join(RESULTS_DIR, "Opt_design_control_parameters")
+JOINT_DATA_DIR = os.path.join(RESULTS_DIR, "opt_joint_data")
+
 # Configurable inputs
 CASE = "Nominal"  # A, B, C, or Nominal
 
-Case_A_json_path = "/home/stochlab/repo/optimal-design-legged-robots/results/Opt_design_control_parameters/CaseA_ll.json"
-Case_B_json_path = "/home/stochlab/repo/optimal-design-legged-robots/results/Opt_design_control_parameters/CaseB_gear_opt.json"
-Case_C_json_path = "/home/stochlab/repo/optimal-design-legged-robots/results/Opt_design_control_parameters/CaseC_full_codesign_opt.json"
-Nominal_json_path = "/home/stochlab/repo/optimal-design-legged-robots/results/Opt_design_control_parameters/Nominal.json"
+Case_A_json_path = os.path.join(OPT_PARAMS_DIR, "CaseA_ll.json")
+Case_B_json_path = os.path.join(OPT_PARAMS_DIR, "CaseB_gear_opt.json")
+Case_C_json_path = os.path.join(OPT_PARAMS_DIR, "CaseC_full_codesign_opt.json")
+Nominal_json_path = os.path.join(OPT_PARAMS_DIR, "Nominal.json")
 
-Case_A_joint_data_csv_path = "/home/stochlab/repo/optimal-design-legged-robots/results/opt_joint_data/Case_A_Jump_Timeseries.csv"
-Case_B_joint_data_csv_path = "/home/stochlab/repo/optimal-design-legged-robots/results/opt_joint_data/Case_B_Jump_Timeseries.csv"
-Case_C_joint_data_csv_path = "/home/stochlab/repo/optimal-design-legged-robots/results/opt_joint_data/Case_C_Jump_Timeseries.csv"
-Nominal_joint_data_csv_path = "/home/stochlab/repo/optimal-design-legged-robots/results/opt_joint_data/Nominal_Jump_Timeseries.csv"
+Case_A_joint_data_csv_path = os.path.join(JOINT_DATA_DIR, "Case_A_Jump_Timeseries.csv")
+Case_B_joint_data_csv_path = os.path.join(JOINT_DATA_DIR, "Case_B_Jump_Timeseries.csv")
+Case_C_joint_data_csv_path = os.path.join(JOINT_DATA_DIR, "Case_C_Jump_Timeseries.csv")
+Nominal_joint_data_csv_path = os.path.join(JOINT_DATA_DIR, "Nominal_Jump_Timeseries.csv")
 
-Case_A_xml_folder = "/home/stochlab/repo/optimal-design-legged-robots/xmls/Case_A_xmls"
-Case_B_xml_folder = "/home/stochlab/repo/optimal-design-legged-robots/xmls/Case_B_xmls"
-Case_C_xml_folder = "/home/stochlab/repo/optimal-design-legged-robots/xmls/Case_C_xmls"
-Nominal_xml_folder = "/home/stochlab/repo/optimal-design-legged-robots/xmls/Nominal_xmls"
+Case_A_xml_folder = os.path.join(XMLS_DIR, "Case_A_xmls")
+Case_B_xml_folder = os.path.join(XMLS_DIR, "Case_B_xmls")
+Case_C_xml_folder = os.path.join(XMLS_DIR, "Case_C_xmls")
+Nominal_xml_folder = os.path.join(XMLS_DIR, "Nominal_xmls")
 
 CASE_CONFIG = {
     "A": {
@@ -463,7 +469,7 @@ motor_right_name = get_field(secondary, "Hip right motor", "motor_right_name", "
 gear_left_ratio = float(get_field(secondary, "Hip left ratio", "gear_left_ratio", "gear_ratio_left"))
 gear_right_ratio = float(get_field(secondary, "Hip right ratio", "gear_right_ratio", "gear_ratio_right"))
 
-config_path = "/home/stochlab/repo/optimal-design-legged-robots/COMPAct/config_files/config.json"
+config_path = os.path.join(REPO_DIR, "Actuator Optimization", "config_files", "config.json")
 motor_left_key = f"Motor{motor_left_name}_framed"
 motor_right_key = f"Motor{motor_right_name}_framed"
 hip1_peak_torque = get_motor_continuous_torque(config_path, motor_left_key) * gear_left_ratio

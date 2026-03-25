@@ -3,26 +3,28 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 
-CASE = "Nominal"  # Choose: A, B, C, or Nominal
-SAVE_FIG = False
-OUTPUT_DIR = "/home/stochlab/repo/optimal-design-legged-robots/results/opt_joint_data"
+CASE = "C"  # Choose: A, B, C, or Nominal
+SAVE_FIG = True
+BASE_DIR = os.path.dirname(__file__)
+RESULTS_DIR = os.path.abspath(os.path.join(BASE_DIR, ".."))
+OUTPUT_DIR = BASE_DIR
 
 CASE_CHOICES = {
 	"A": {
-		"csv_path": "/home/stochlab/repo/optimal-design-legged-robots/results/opt_joint_data/Case_A_Jump_Timeseries.csv",
-		"params_path": "/home/stochlab/repo/optimal-design-legged-robots/results/Opt_design_control_parameters/CaseA_ll.json",
+		"csv_path": os.path.join(BASE_DIR, "Case_A_Jump_Timeseries.csv"),
+		"params_path": os.path.join(RESULTS_DIR, "Opt_design_control_parameters", "CaseA_ll.json"),
 	},
 	"B": {
-		"csv_path": "/home/stochlab/repo/optimal-design-legged-robots/results/opt_joint_data/Case_B_Jump_Timeseries.csv",
-		"params_path": "/home/stochlab/repo/optimal-design-legged-robots/results/Opt_design_control_parameters/CaseB_gear_opt.json",
+		"csv_path": os.path.join(BASE_DIR, "Case_B_Jump_Timeseries.csv"),
+		"params_path": os.path.join(RESULTS_DIR, "Opt_design_control_parameters", "CaseB_gear_opt.json"),
 	},
 	"C": {
-		"csv_path": "/home/stochlab/repo/optimal-design-legged-robots/results/opt_joint_data/Case_C_Jump_Timeseries.csv",
-		"params_path": "/home/stochlab/repo/optimal-design-legged-robots/results/Opt_design_control_parameters/CaseC_full_codesign_opt.json",
+		"csv_path": os.path.join(BASE_DIR, "Case_C_Jump_Timeseries.csv"),
+		"params_path": os.path.join(RESULTS_DIR, "Opt_design_control_parameters", "CaseC_full_codesign_opt.json"),
 	},
 	"NOMINAL": {
-		"csv_path": "/home/stochlab/repo/optimal-design-legged-robots/results/opt_joint_data/Nominal_Jump_Timeseries.csv",
-		"params_path": "/home/stochlab/repo/optimal-design-legged-robots/results/Opt_design_control_parameters/Nominal.json",
+		"csv_path": os.path.join(BASE_DIR, "Nominal_Jump_Timeseries.csv"),
+		"params_path": os.path.join(RESULTS_DIR, "Opt_design_control_parameters", "Nominal.json"),
 	},
 }
 
