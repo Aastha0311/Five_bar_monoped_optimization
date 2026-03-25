@@ -4,7 +4,7 @@ import mujoco as mj
 import time
 import sys, os
 #sys.path.append("/home/stochlab/repo/Aastha_Coopt_Monoped/Monoped-optimization")
-import ik_5bar as ik
+import utils.ik_5bar as ik
 import vmc_action_5bar as vmc_rp
 import imageio
 # import ik as ik

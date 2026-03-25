@@ -19,7 +19,7 @@ import opt_codesign_5bar as rcp
 import json 
 # Define the coefficient sets
 coefficient_sets = []
-for first_coeff in np.arange(0.55, 0.6, 0.05):  # 0.4 to 0.8 with step 0.05
+for first_coeff in np.arange(0.99, 1, 0.01):  # 0.4 to 0.8 with step 0.05
     second_coeff = 1.0 - first_coeff
     coefficient_sets.append((first_coeff, second_coeff))
 
@@ -395,12 +395,12 @@ for coeff_set in coefficient_sets:
                 )
 
                 tau_left = get_continuous_torque(
-                    "/home/stochlab/repo/optimal-design-legged-robots/COMPAct/config_files/config.json",
+                    "/home/stochlab/repo/optimal-design-legged-robots/Actuator Optimization/config_files/config.json",
                     "Motor" + motor_left_name + "_framed"
                 ) * gear_left_ratio
 
                 tau_right = get_continuous_torque(
-                    "/home/stochlab/repo/optimal-design-legged-robots/COMPAct/config_files/config.json",
+                    "/home/stochlab/repo/optimal-design-legged-robots/Actuator Optimization/config_files/config.json",
                     "Motor" + motor_right_name + "_framed"
                 ) * gear_right_ratio
 
@@ -464,7 +464,7 @@ for coeff_set in coefficient_sets:
                         "duration": best_duration
                     })
 
-                if len(run_results) == 0:
+                if len(run_results) == 0 or best_height < 0.01:
                     return 1e6
 
                 # -------------------------

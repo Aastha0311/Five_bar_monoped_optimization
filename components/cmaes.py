@@ -325,12 +325,12 @@ for coeff_set in coefficient_sets:
                 )
 
                 tau_left = get_continuous_torque(
-                    "/home/stochlab/repo/optimal-design-legged-robots/COMPAct/config_files/config.json",
+                    "/home/stochlab/repo/optimal-design-legged-robots/Actuator Optimization/config_files/config.json",
                     "Motor" + motor_left_name + "_framed"
                 ) * gear_left_ratio
 
                 tau_right = get_continuous_torque(
-                    "/home/stochlab/repo/optimal-design-legged-robots/COMPAct/config_files/config.json",
+                    "/home/stochlab/repo/optimal-design-legged-robots/Actuator Optimization/config_files/config.json",
                     "Motor" + motor_right_name + "_framed"
                 ) * gear_right_ratio
 

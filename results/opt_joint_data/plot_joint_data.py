@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 CASE = "Nominal"  # Choose: A, B, C, or Nominal
-SAVE_FIG = True
+SAVE_FIG = False
 OUTPUT_DIR = "/home/stochlab/repo/optimal-design-legged-robots/results/opt_joint_data"
 
 CASE_CHOICES = {

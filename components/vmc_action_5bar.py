@@ -224,22 +224,16 @@ class Controller:
 
         mj.mj_jacSite(self.m, self.d, Jp_left, None, self.left_tip_id)
         mj.mj_jacSite(self.m, self.d, Jp_right, None, self.right_tip_id)
-        theta1 = self.d.qpos[self.hip_left_dof]
-        theta2 = self.d.qpos[self.hip_right_dof]
-        x, y, z = self.d.site_xpos[self.left_tip_id]
-        J = self.fivebar_jacobian(theta1, theta2, x, z, self.hip_offset_full, self.thigh_length, self.calf_length)
+        
+        
         Jp = 0.5 * (Jp_left + Jp_right)
         
         F = self.force_world()
-        #F_planar = np.array([F[0], F[2]])
-        #print("X force:", F[0], "Y force:", F[1], "Z force:", F[2])
-        #tau_full = J.T @ F_planar
+        
         tau_full = Jp.T @ F
-        #print("full torque vector shape:", tau_full.shape)
-        #print("Full torque vector:", tau_full)
+        
         tau_left = tau_full[self.hip_left_dof]
         tau_right = tau_full[self.hip_right_dof]
-        # tau_left = tau_full[0]
-        # tau_right = tau_full[1]
+        
 
         return np.array([tau_left, tau_right])
