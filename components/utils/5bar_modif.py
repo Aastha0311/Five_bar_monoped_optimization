@@ -18,13 +18,6 @@ import sys, os
 #import old_rcp_5bar_wovideo as rcp
 import json 
 
-BASE_DIR = os.path.dirname(__file__)
-REPO_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", ".."))
-RESULTS_DIR = os.path.join(REPO_DIR, "results")
-XMLS_DIR = os.path.join(REPO_DIR, "xmls")
-COMPONENTS_DIR = os.path.join(REPO_DIR, "components")
-ACT_OPT_DIR = os.path.join(REPO_DIR, "Actuator Optimization")
-
 def motor_index_to_name(x):
             """
             Maps a numeric input to one of six motor names.
@@ -99,7 +92,7 @@ def get_motor_gearbox_properties(csv_path, motor_name, gear_ratio):
 
     return mass, efficiency, gearbox
     # Helper Functions
-dft = pd.read_csv(os.path.join(COMPONENTS_DIR, "thigh_15_35.csv"))
+dft = pd.read_csv('/home/stochlab/repo/optimal-design-legged-robots/components/thigh_15_35.csv')
 
     # Sort by gear ratio to avoid interpolation issues
 dft = dft.sort_values(by='Link Length (mm)')
@@ -118,7 +111,7 @@ thigh_interp_func = interp1d(
 )
 
 
-dfc = pd.read_csv(os.path.join(COMPONENTS_DIR, "calf_15_35.csv"))
+dfc = pd.read_csv('/home/stochlab/repo/optimal-design-legged-robots/components/calf_15_35.csv')
 
 # Sort by gear ratio to avoid interpolation issues
 dfc = dfc.sort_values(by='Link Length (mm)')
@@ -300,8 +293,9 @@ def get_continuous_torque(json_path, motor_name):
 
     return tau_cont
 
-# xml_path = os.path.join(XMLS_DIR, "design_xmls", "8778abeb.xml")
-# modified_xml_path = os.path.join(XMLS_DIR, "5bar_baseline.xml")
+# xml_path="/home/stochlab/repo/optimal-design-legged-robots/xmls/design_xmls/8778abeb.xml"
+
+# modified_xml_path="/home/stochlab/repo/optimal-design-legged-robots/xmls/5bar_baseline.xml"
 
 ik_height = 0.45
 thigh_length = 0.297
@@ -319,33 +313,33 @@ gear_right_ratio = 6.0
 
 
 mass_left_actuator, efficiency_left_actuator, gearbox_left = get_motor_gearbox_properties(
-    os.path.join(RESULTS_DIR, "optimal_gearbox_selection.csv"),
+    "/home/stochlab/repo/optimal-design-legged-robots/results/optimal_gearbox_selection.csv",
     motor_left_name,
     gear_left_ratio
 )
 
 mass_right_actuator, efficiency_right_actuator, gearbox_right = get_motor_gearbox_properties(
-    os.path.join(RESULTS_DIR, "optimal_gearbox_selection.csv"),
+    "/home/stochlab/repo/optimal-design-legged-robots/results/optimal_gearbox_selection.csv",
     motor_right_name,
     gear_right_ratio
 )
 print(efficiency_left_actuator, efficiency_right_actuator)
 
 tau_left = get_continuous_torque(
-    os.path.join(ACT_OPT_DIR, "config_files", "config.json"),
+    "/home/stochlab/repo/optimal-design-legged-robots/COMPAct/config_files/config.json",
     "Motor" + motor_left_name + "_framed"
 ) * gear_left_ratio
 
 tau_right = get_continuous_torque(
-    os.path.join(ACT_OPT_DIR, "config_files", "config.json"),
+    "/home/stochlab/repo/optimal-design-legged-robots/COMPAct/config_files/config.json",
     "Motor" + motor_right_name + "_framed"
 ) * gear_right_ratio
 
 unique_id = uuid.uuid4().hex[:8]
 
 modify_5bar_xml(
-    xml_file=os.path.join(XMLS_DIR, "design_xmls", "8778abeb.xml"),
-    output_file=os.path.join(XMLS_DIR, "5bar_baseline_new.xml"),
+    xml_file="/home/stochlab/repo/optimal-design-legged-robots/xmls/design_xmls/8778abeb.xml",
+    output_file="/home/stochlab/repo/optimal-design-legged-robots/xmls/5bar_baseline_new.xml",
     base_height=ik_height,
     l1=thigh_length,
     l2=calf_length,

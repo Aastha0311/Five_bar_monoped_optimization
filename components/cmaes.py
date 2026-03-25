@@ -134,19 +134,6 @@ for coeff_set in coefficient_sets:
             gearbox = row["gearbox"]
 
             return mass, efficiency, gearbox
-        dft = pd.read_csv(os.path.join(COMPONENTS_DIR, "thigh_15_35.csv"))
-        dft = dft.sort_values(by='Link Length (mm)')
-        thigh_lengths = dft['Link Length (mm)'].values/1000
-        thigh_masses = dft['Calculated Mass (kg)'].values
-        thigh_interp_func = interp1d(
-            thigh_lengths,
-            thigh_masses,
-            kind='linear',
-            bounds_error=False,
-            fill_value="extrapolate"
-        )
-
-
         dfc = pd.read_csv(os.path.join(COMPONENTS_DIR, "calf_15_35.csv"))
 
         dfc = dfc.sort_values(by='Link Length (mm)')
@@ -195,7 +182,6 @@ for coeff_set in coefficient_sets:
                 efficiency_right,
                 mass_left,
                 mass_right,
-                thigh_interp_func,
                 calf_interp_func):
 
             tree = ET.parse(xml_file)
@@ -365,7 +351,6 @@ for coeff_set in coefficient_sets:
                     efficiency_right,
                     mass_left,
                     mass_right,
-                    thigh_interp_func,
                     calf_interp_func
                 )
 

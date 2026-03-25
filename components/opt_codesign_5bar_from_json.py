@@ -1,21 +1,11 @@
+import csv
 import json
 import numpy as np
 import mujoco as mj
 import time
-import sys, os
+import os
 import utils.ik_5bar as ik
 import vmc_action_5bar as vmc_rp
-import imageio
-# import ik as ik
-import random
-# import vmc_roc_angle as vmc_ra_angle
-import pandas as pd
-from scipy.interpolate import interp1d
-# Set fixed random seed for deterministic behavior
-np.random.seed(0)
-random.seed(0)
-import mujoco.viewer
-import csv
 
 BASE_DIR = os.path.dirname(__file__)
 REPO_DIR = os.path.abspath(os.path.join(BASE_DIR, ".."))
@@ -88,7 +78,7 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
     hip_left_id  = mj.mj_name2id(m, mj.mjtObj.mjOBJ_JOINT, "hip_left")
     hip_right_id = mj.mj_name2id(m, mj.mjtObj.mjOBJ_JOINT, "hip_right")
 
-    hip_left_dof  = m.jnt_dofadr[hip_left_id] #start address in qvel array for this joint
+    hip_left_dof  = m.jnt_dofadr[hip_left_id]
     hip_right_dof = m.jnt_dofadr[hip_right_id] 
     hip_left_qpos = m.jnt_qposadr[hip_left_id]
     hip_right_qpos = m.jnt_qposadr[hip_right_id]
@@ -106,16 +96,8 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
     knee_left_qpos = m.jnt_qposadr[knee_left_id]
     knee_right_qpos = m.jnt_qposadr[knee_right_id]
 
-    # -----------------------
-    # Actuators
-    # -----------------------
     hip_left_actuator_id  = m.actuator('motor_left').id
     hip_right_actuator_id = m.actuator('motor_right').id
-    torque_left_store = []
-    torque_right_store = []
-    # -----------------------
-    # Spawn from IK
-    # -----------------------
     q1_l, q2_l, q1_r, q2_r = ik.ik_5bar(0.0, ik_value, thigh_length, calf_length, hip_offset)
 
     d.qpos[m.joint("hip_left").qposadr[0]] = q1_l
@@ -133,16 +115,9 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
     jump_count = 0
     in_air = False
     tracking_jump = False
-    # hip_actuator_id = m.actuator('torque1').id    
-    # knee_actuator_id = m.actuator('torque2').id    
-    
     r_left = 0.186
     r_right = 0.063
 
-    # theta1, theta2 = ik.inverse_kinematics(0, ik_value, l1n, l2n)
-    
-    # theta1d = np.rad2deg(theta1)
-    # theta2d = np.rad2deg(theta2)
     current_x_max = float('-inf')
     start = time.time() 
  
@@ -168,17 +143,11 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
     max_steps = 2000
     step_counter = 0
     jump_timeseries = []
-    # with mujoco.viewer.launch_passive(m, d) as viewer:
-    #     while viewer.is_running():
     while jump_count < 1 and step_counter < max_steps:
         step_counter += 1  # Stop after 1 jump
         step_start = time.time()
         t_elapsed = time.time() - start        
         if t_elapsed < 0:
-            # hip_error = 0 - d.qpos[2]
-            # knee_error = 0 - d.qpos[3]
-            # hip_torque = 100 * hip_error - 10 * d.qvel[2]
-            # knee_torque = 100 * knee_error - 10 * d.qvel[3]
             q_l = d.qpos[m.joint("hip_left").qposadr[0]]
             q_r = d.qpos[m.joint("hip_right").qposadr[0]]
 
@@ -188,8 +157,6 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
             hip_left_torque = kp*(q1_l - q_l) - kd*qd_l
             hip_right_torque = kp*(q1_r - q_r) - kd*qd_r
 
-            #mj.mj_step(m, d)
-            #viewer.sync()
         else:
             controller = vmc_rp.Controller(
                 m,
@@ -268,11 +235,6 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
                     hip_left_torque = np.clip(joint_torque[0], -hip1_peak_torque, hip1_peak_torque)
                     hip_right_torque = np.clip(joint_torque[1], -hip2_peak_torque, hip2_peak_torque)
                 else:
-                    # Default control when not in a jump phase
-                    # hip_error = 0 - d.qpos[2]
-                    # knee_error = 0 - d.qpos[3]
-                    # hip_torque = 100 * hip_error - 10 * d.qvel[2]
-                    # knee_torque = 100 * knee_error - 10 * d.qvel[3]
                         q_l = d.qpos[m.joint("hip_left").qposadr[0]]
                         q_r = d.qpos[m.joint("hip_right").qposadr[0]]
 
@@ -288,7 +250,6 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
                     jump_phase = "air"
                 
                 elif jump_started and jump_phase == "air":
-                    # Update max height during air phase
                     current_jump_max_z = max(current_jump_max_z, d.qpos[slide_z_dof])
                 
                 # Default control in air
@@ -304,17 +265,10 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
             
             previous_base_vel = current_base_vel
         
-        # Apply Control Torques
         hip_left_torque = np.clip(hip_left_torque, -hip1_peak_torque, hip1_peak_torque)
         hip_right_torque = np.clip(hip_right_torque, -hip2_peak_torque, hip2_peak_torque)
-        # hip_left_torque = 0.2*hip_left_torque + 0.5*prev_torque_left
-        # hip_right_torque = 0.5*hip_right_torque + 0.5*prev_torque_right
-        # prev_torque_left = efficiency_left*hip_left_torque
-        # prev_torque_right = efficiency_right*hip_right_torque
         d.ctrl[hip_left_actuator_id] = efficiency_left * hip_left_torque
         d.ctrl[hip_right_actuator_id] = efficiency_right * hip_right_torque
-        torque_left_store.append(efficiency_left*hip_left_torque)
-        torque_right_store.append(efficiency_right*hip_right_torque)
 
         if jump_started:
             jump_timeseries.append({
@@ -329,10 +283,7 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
                 "ctrl_right": d.ctrl[hip_right_actuator_id],
             })
 
-        # Calculate energy for the current jump (starts from ground contact with positive velocity)
-        #if jump_started and t_elapsed >= 0:
         if jump_started and t_elapsed >= 0 and on_ground and current_base_vel > 0 and jump_phase != "landing" and jump_started:
-            # Mechanical energy (work done by actuators)
             ha1 = m.opt.timestep * efficiency_left*hip_left_torque * d.qvel[hip_left_dof]            
             ha2 = m.opt.timestep * efficiency_right*hip_right_torque * d.qvel[hip_right_dof]
             if ha1 < 0:
@@ -340,43 +291,22 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
             if ha2 < 0:
                 ha2 = 0
             mech_energy_step = ha1 + ha2
-            #print(efficiency_left*hip_left_torque, efficiency_right*hip_right_torque)
-            # Joule heating energy (I2R losses)
             hip_left_joule = (1/kt_left) * (1/kt_left)* ((efficiency_left*hip_left_torque)**2) * m.opt.timestep*r_left
             hip_right_joule = (1/kt_right) * (1/kt_right)* ((efficiency_right*hip_right_torque)**2) * m.opt.timestep*r_right
             joule_energy_step = hip_left_joule + hip_right_joule
             
-            # Total energy (mechanical + joule)
             total_energy_step = mech_energy_step
             
-            # Update jump energy accumulators
             current_jump_mech_energy += mech_energy_step
             current_jump_joule_energy += joule_energy_step
             current_jump_total_energy += total_energy_step
-            #print(m.opt.timestep, efficiency_left*hip_left_torque, efficiency_right*hip_right_torque, mech_energy_step, joule_energy_step, total_energy_step)
             
-            # Also track total energy for all jumps
             hip_energy += ha1
             knee_energy += ha2
             total_energy += mech_energy_step
         
-        # Step simulation
-    
-        
         mj.mj_step(m, d)
-        # viewer.sync()
-        # if record_video:
-        #         renderer.update_scene(d)
-        #         frame = renderer.render()
-        #         frames.append(frame.copy())
-        
-        
-        # Respect simulation timestep
-        # time_until_next_step = m.opt.timestep - (time.time() - step_start)
-        # if time_until_next_step > 0:
-        #     time.sleep(time_until_next_step)
 
-    # Record the final jump if simulation ends during a jump
     if len(jump_results) == 0:
 
         best_height = -1e6
@@ -387,7 +317,6 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
 
     else:
 
-        # choose jump with highest forward velocity
         best_jump = max(jump_results, key=lambda x: x[8])
 
         best_height = best_jump[0]
@@ -395,12 +324,6 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
         best_energy = best_jump[3]
         best_duration = best_jump[7]
         best_x_vel = best_jump[8]
-        # print(torque_left_store)
-        # print(torque_right_store)
-    # if record_video:
-    #     renderer.close()
-    #     imageio.mimsave(video_filename, frames, fps=video_fps)
-    #     print(f"Video saved to {video_filename}")
 
     if jump_timeseries:
         timestamp = time.strftime("%Y%m%d_%H%M%S")
@@ -475,8 +398,6 @@ motor_right_key = f"Motor{motor_right_name}_framed"
 hip1_peak_torque = get_motor_continuous_torque(config_path, motor_left_key) * gear_left_ratio
 hip2_peak_torque = get_motor_continuous_torque(config_path, motor_right_key) * gear_right_ratio
 
-# Spring-damper-torsion gains
-# [linear_kp, linear_kd, rotational_kp]
 action = np.array([
     float(get_field(secondary, "ac1", "ac1 (kp)")),
     float(get_field(secondary, "ac2", "ac2 (kd)")),
