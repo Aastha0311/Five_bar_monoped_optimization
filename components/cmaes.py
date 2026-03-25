@@ -1,22 +1,18 @@
 import csv
+import json
+import multiprocessing
+import os
+import uuid
+from collections import Counter
+from datetime import datetime
+
 import cma
 import numpy as np
-import xml.etree.ElementTree as ET
-from collections import Counter
-#import rcp
-import os
-import sys
-import multiprocessing
-import uuid
-from datetime import datetime
-#from Post_Humanoids.controller_codes import final_rcp as rcp
 import pandas as pd
-import numpy as np
+import xml.etree.ElementTree as ET
 from scipy.interpolate import interp1d
-import sys, os
-#sys.path.append("/home/stochlab/repo/Aastha_Coopt_Monoped/Monoped-optimization")
+
 import opt_codesign_5bar as rcp
-import json 
 # Define the coefficient sets
 coefficient_sets = []
 for first_coeff in np.arange(0.55, 0.60, 0.05):  # 0.4 to 0.8 with step 0.05
@@ -63,17 +59,12 @@ for coeff_set in coefficient_sets:
             [0, 10],
             [10, 50]
         ])
-        import pandas as pd
-
         def motor_index_to_name(x):
             """
             Maps a numeric input to one of six motor names.
             """
 
-            # round to nearest integer
             idx = int(round(x))
-
-            # clamp to range 1–6
             idx = max(1, min(6, idx))
 
             motor_map = {
@@ -107,73 +98,52 @@ for coeff_set in coefficient_sets:
             efficiency : float
             """
 
-            # round ratio to one decimal
             ratio = round(gear_ratio, 1)
 
             df = pd.read_csv(csv_path)
 
-            # filter motor
             df_motor = df[df["motor"] == motor_name]
 
             if df_motor.empty:
                 raise ValueError(f"Motor {motor_name} not found in CSV")
 
-            # filter ratio
             idx = (df_motor["target_ratio"] - ratio).abs().idxmin()
             row = df_motor.loc[idx]
-            #row = df_motor[df_motor["target_ratio"] == ratio]
 
             if row.empty:
                 raise ValueError(
                     f"Motor {motor_name} with ratio {ratio} not found in CSV"
                 )
 
-            # mass = row.iloc[0]["mass"]
-            # efficiency = row.iloc[0]["efficiency"]
             mass = row["mass"]
             efficiency = row["efficiency"]
-            #get gearbox from the row
             gearbox = row["gearbox"]
 
-            #print(f"Selected Motor: {motor_name}, Gear Ratio: {ratio}, Mass: {mass}, Efficiency: {efficiency}")
-
             return mass, efficiency, gearbox
-        # Helper Functions
         dft = pd.read_csv('/home/stochlab/repo/optimal-design-legged-robots/components/thigh_15_35.csv')
-
-        # Sort by gear ratio to avoid interpolation issues
         dft = dft.sort_values(by='Link Length (mm)')
-
-        # Extract gear ratio and mass
         thigh_lengths = dft['Link Length (mm)'].values/1000
         thigh_masses = dft['Calculated Mass (kg)'].values
-
-        # Create a linear interpolation function without extrapolation
         thigh_interp_func = interp1d(
             thigh_lengths,
             thigh_masses,
             kind='linear',
             bounds_error=False,
-            fill_value="extrapolate"  # This raises an error if input is out of bounds
+            fill_value="extrapolate"
         )
 
 
         dfc = pd.read_csv('/home/stochlab/repo/optimal-design-legged-robots/components/calf_15_35.csv')
 
-        # Sort by gear ratio to avoid interpolation issues
         dfc = dfc.sort_values(by='Link Length (mm)')
-
-        # Extract gear ratio and mass
         calf_lengths = dfc['Link Length (mm)'].values/1000
         calf_masses = dfc['Calculated Mass (kg)'].values
-
-        # Create a linear interpolation function without extrapolation
         calf_interp_func = interp1d(
             calf_lengths,
             calf_masses,
             kind='linear',
             bounds_error=False,
-            fill_value="extrapolate"  # This raises an error if input is out of bounds
+            fill_value="extrapolate"
         )
 
 
@@ -185,7 +155,6 @@ for coeff_set in coefficient_sets:
             norm_params = np.clip(norm_params, 0, 1)
             return norm_params * (original_bounds[:, 1] - original_bounds[:, 0]) + original_bounds[:, 0]
 
-        import xml.etree.ElementTree as ET
         def inverse_kinematics(x, z, l1, l2, branch=1):
             c2 = (x**2 + z**2 - l1**2 - l2**2) / (2 * l1 * l2)
             if abs(c2) > 1:
@@ -199,9 +168,6 @@ for coeff_set in coefficient_sets:
             theta1 = np.arctan2(A*x + B*z, x*B - A*z)
             return theta1, theta2
         
-        import xml.etree.ElementTree as ET
-
-
         def modify_5bar_xml(
                 xml_file,
                 output_file,
@@ -223,16 +189,8 @@ for coeff_set in coefficient_sets:
 
             half_width = torso_width / 2
 
-            # -----------------------------
-            # Link masses from interpolation
-            # -----------------------------
             thigh_mass = float(calf_interp_func(l1))
             calf_mass = float(calf_interp_func(l2))
-            # print(f"Interpolated thigh mass for length {l1:.3f} m: {thigh_mass:.3f} kg")
-            # print(f"Interpolated calf mass for length {l2:.3f} m: {calf_mass:.3f} kg")
-            # -----------------------------
-            # Update torso width + mass
-            # -----------------------------
 
             for body in root.findall(".//body[@name='root']"):
                 pos = body.get("pos").split()
@@ -248,18 +206,12 @@ for coeff_set in coefficient_sets:
                 total_mass = base_mass + mass_left + mass_right
                 geom.set("mass", str(total_mass))
 
-            # -----------------------------
-            # Move hip joint locations
-            # -----------------------------
             for body in root.findall(".//body[@name='l1_left']"):
                 body.set("pos", f"{-half_width} 0 0")
 
             for body in root.findall(".//body[@name='l1_right']"):
                 body.set("pos", f"{half_width} 0 0")
 
-            # -----------------------------
-            # Update thigh lengths + mass
-            # -----------------------------
             for geom in root.findall(".//geom[@name='thigh_left']"):
                 geom.set("fromto", f"0 0 0 {l1} 0 0")
                 geom.set("mass", str(thigh_mass))
@@ -268,18 +220,12 @@ for coeff_set in coefficient_sets:
                 geom.set("fromto", f"0 0 0 {l1} 0 0")
                 geom.set("mass", str(thigh_mass))
 
-            # -----------------------------
-            # Move knee joints
-            # -----------------------------
             for body in root.findall(".//body[@name='l2_left']"):
                 body.set("pos", f"{l1} 0 0")
 
             for body in root.findall(".//body[@name='l2_right']"):
                 body.set("pos", f"{l1} 0 0")
 
-            # -----------------------------
-            # Update calf/shank lengths + mass
-            # -----------------------------
             for geom in root.findall(".//geom[@name='shank_left']"):
                 geom.set("fromto", f"0 0 0 {l2} 0 0")
                 geom.set("mass", str(calf_mass))
@@ -288,27 +234,18 @@ for coeff_set in coefficient_sets:
                 geom.set("fromto", f"0 0 0 {l2} 0 0")
                 geom.set("mass", str(calf_mass))
 
-            # -----------------------------
-            # Move feet
-            # -----------------------------
             for geom in root.findall(".//geom[@name='foot_left']"):
                 geom.set("pos", f"{l2} 0 0")
 
             for geom in root.findall(".//geom[@name='foot_right']"):
                 geom.set("pos", f"{l2} 0 0")
 
-            # -----------------------------
-            # Move coupler sites
-            # -----------------------------
             for site in root.findall(".//site[@name='left_tip']"):
                 site.set("pos", f"{l2} 0 0")
 
             for site in root.findall(".//site[@name='right_tip']"):
                 site.set("pos", f"{l2} 0 0")
 
-            # -----------------------------
-            # Update torque limits
-            # -----------------------------
             for motor in root.findall(".//motor[@name='motor_left']"):
                 motor.set("ctrlrange", f"-{efficiency_left*torque_left} {efficiency_left*torque_left}")
 
@@ -316,8 +253,6 @@ for coeff_set in coefficient_sets:
                 motor.set("ctrlrange", f"-{efficiency_right*torque_right} {efficiency_right*torque_right}")
 
             tree.write(output_file)
-
-        import pandas as pd
 
         def get_continuous_torque(json_path, motor_name):
             """
@@ -334,15 +269,10 @@ for coeff_set in coefficient_sets:
 
             motor = motors[motor_name]
 
-            Kv = motor["Kv"]                       # rpm/V
-            I_cont = motor["maxContinuousCurrent"] # A
-
-            # torque constant
+            Kv = motor["Kv"]
+            I_cont = motor["maxContinuousCurrent"]
             Kt = 60 / (2 * np.pi * Kv)
-
-            # continuous torque
             tau_cont = Kt * I_cont
-            #print(f"Continuous torque for {motor_name}: {tau_cont:.3f} Nm")
 
             return tau_cont
 
@@ -425,10 +355,6 @@ for coeff_set in coefficient_sets:
                     calf_interp_func
                 )
 
-                # -------------------------
-                # RUN SIMULATION 5 TIMES
-                # -------------------------
-
                 run_results = []
 
                 for i in range(5):
@@ -467,16 +393,11 @@ for coeff_set in coefficient_sets:
                 if len(run_results) == 0 or best_height<0.01 :
                     return 1e6
 
-                # -------------------------
-                # MODE DISTANCE SELECTION
-                # -------------------------
-
                 rounded_distances = [round(r["distance"], 2) for r in run_results]
 
                 distance_counts = Counter(rounded_distances)
                 mode_distance = distance_counts.most_common(1)[0][0]
 
-                # pick first run matching the mode
                 selected_run = None
 
                 for r in run_results:
@@ -489,15 +410,7 @@ for coeff_set in coefficient_sets:
                 best_distance = selected_run["distance"]
                 best_energy = selected_run["energy"]
 
-                # -------------------------
-                # COST
-                # -------------------------
-
                 cost = coeff1 * (-best_distance * 20) + coeff2 * (best_energy)
-
-                # -------------------------
-                # SAVE ALL RUNS
-                # -------------------------
 
                 with open(all_samples_file, "a", newline="") as file:
 
@@ -525,20 +438,12 @@ for coeff_set in coefficient_sets:
         
             
 
-        # CMA-ES Optimization
         x0 = normalize(np.array([0.25, 0.25, 0.1, 0.35, 5.0, 0.0, 3, 4, 10.0, 10.0, 550, 5, 30]))
         sigma0 = 0.1
         opts = cma.CMAOptions()
         opts.set({
             'maxiter': 1000, 'popsize': 8, 'seed': int(seed),
             'bounds': [np.zeros(13), np.ones(13)], 'verb_disp': 1000, 'verb_disp': 1})
-            # 'tolfun': 0,
-            # 'tolfunhist': 0,
-            # 'tolx': 0,
-            # 'tolstagnation': 1000,
-
-            
-                
 
         es = cma.CMAEvolutionStrategy(x0, sigma0, opts)
 
@@ -560,8 +465,6 @@ for coeff_set in coefficient_sets:
                 solutions = es.ask()
 
                 costs = pool.map(get_cost, solutions)
-
-                #print("costs:", costs)
 
                 best_index = np.argmin(costs)
                 best_params = denormalize(solutions[best_index])
@@ -618,13 +521,8 @@ for coeff_set in coefficient_sets:
 
         print(f"Joint optimization completed for seed {seed}.")
         print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        #store time taken in the end of best results file
         with open(best_results_file, "a", newline="") as file:
             writer = csv.writer(file)
-            #subtract start time from end time
             end_time = datetime.now()
-            # start_time = datetime.strptime(es.start_time, "%Y-%m-%d %H:%M:%S")
-            # start_time = 
-            # time_taken = (end_time - start_time).total_seconds()
             writer.writerow(["Time taken (seconds)"])
             writer.writerow([end_time.strftime("%Y-%m-%d %H:%M:%S")])

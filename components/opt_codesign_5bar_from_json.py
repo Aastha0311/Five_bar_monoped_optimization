@@ -185,7 +185,17 @@ def run(xml_path, action, ik_value, hip1_peak_torque, hip2_peak_torque, thigh_le
             #mj.mj_step(m, d)
             #viewer.sync()
         else:
-            controller = vmc_rp.Controller(m, d, xml_path, action, ori_l=ori_l, ori_theta=ori_theta)
+            controller = vmc_rp.Controller(
+                m,
+                d,
+                xml_path,
+                action,
+                thigh_length,
+                calf_length,
+                hip_offset * 2,
+                ori_l=ori_l,
+                ori_theta=ori_theta,
+            )
             contact_force = controller.get_ground_contact_forces()
             forces = np.array([0, 0, 0])  
             if len(contact_force) > 0:
