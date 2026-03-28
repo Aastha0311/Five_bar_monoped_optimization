@@ -1,23 +1,4 @@
 {
-  "primary": {
-    "thigh_length": 0.230838968798863,
-    "calf_length": 0.2716835607832433,
-    "motor_left_name": "MAD_M6C12",
-    "motor_right_name": "MN8014",
-    "gear_left_ratio": 4.002359795174607,
-    "gear_right_ratio": 7.349924952103571,
-    "gearbox_left": "CPG",
-    "gearbox_right": "SSPG",
-    "torso_distance": 0.0505462930916933,
-    "ik_height": 0.3000016940026108,
-    "ori_l": 4.9801679465315205,
-    "ori_theta": -0.4280724708129266,
-    "best_index": 6.0,
-    "best_cost": -1.2093043423863945,
-    "ac1": 978.7,
-    "ac2": 5.0,
-    "ac3": 36.9
-  },
   "secondary": {
     "Thigh": 0.230838968798863,
     "Calf": 0.2716835607832433,
@@ -38,10 +19,8 @@
     "Max height": 0.3154739179648764,
     "Max distance": 1.030101685175581,
     "Unique id": "e658a122",
-    "Cost": -1.2093043423863945,
     "ac1": 978.7,
     "ac2": 5.0,
     "ac3": 36.9
-  },
-  "secondary_status": null
+  }
 }

@@ -1,23 +1,5 @@
 {
-  "primary": {
-    "thigh_length": 0.297,
-    "calf_length": 0.302,
-    "motor_left_name": "U10",
-    "motor_right_name": "U10",
-    "gear_left_ratio": 6.0,
-    "gear_right_ratio": 6.0,
-    "gearbox_left": "SSPG",
-    "gearbox_right": "SSPG",
-    "torso_distance": 0.125,
-    "ik_height": 0.3000163232768618,
-    "ori_l": 4.200087274579142,
-    "ori_theta": 1.5033841106897363,
-    "best_index": 5.0,
-    "best_cost": -12.459402342405074,
-    "ac1": 197.4,
-    "ac2": 7.7,
-    "ac3": 11.0
-  },
+
   "secondary": {
     "Thigh": 0.297,
     "Calf": 0.302,
@@ -38,10 +20,8 @@
     "Max height": 0.2566169368192373,
     "Max distance": 0.7260280614986402,
     "Unique id": "c017fb87",
-    "Cost": -12.459402342405074,
     "ac1": 197.4,
     "ac2": 7.7,
     "ac3": 11.0
-  },
-  "secondary_status": null
+  }
 }
