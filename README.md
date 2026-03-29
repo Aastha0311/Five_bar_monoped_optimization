@@ -6,8 +6,7 @@ Video of the paper along with simulation videos are given here. Optimised mass a
 
 ## Video
 
-[Click here to watch the video](results/videos/AIM_paper_video.mp4)
-
+[![Watch the video](results/videos/thumbnail.png)](results/videos/AIM_paper_video.mp4)
 
 
 ## Gearbox Optimization Results
