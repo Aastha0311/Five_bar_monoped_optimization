@@ -4,10 +4,10 @@
 
 Video of the paper along with simulation videos are given here. Optimised mass and efficiency plots for gear ratios 4:1 to 35:1.
 
-## Video
 
-[![Watch the video](results/videos/thumbnail.png)](results/videos/AIM_paper_video.mp4)
+## 🎥 Video
 
+[Download / Watch Video](results/videos/AIM_paper_video.mp4)
 
 ## Gearbox Optimization Results
 
