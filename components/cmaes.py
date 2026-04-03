@@ -44,7 +44,7 @@ for coeff_set in coefficient_sets:
         date_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         
         # Update filenames to include coefficient values
-        dynamic_root = os.path.join(RESULTS_DIR, "dynamic_vel_limits")
+        dynamic_root = os.path.join(RESULTS_DIR, "CMAES_output")
         dynamic_subfolders = [
             "Case_A_ll",
             "Case_B_act",
@@ -362,16 +362,7 @@ for coeff_set in coefficient_sets:
                     "Motor" + motor_right_name + "_framed"
                 ) * gear_right_ratio
 
-                kv_left, voltage_left, resistance_left = get_motor_electrical_params(
-                    config_path,
-                    "Motor" + motor_left_name + "_framed"
-                )
-                kv_right, voltage_right, resistance_right = get_motor_electrical_params(
-                    config_path,
-                    "Motor" + motor_right_name + "_framed"
-                )
-                kt_left = 60 / (2 * np.pi * kv_left)
-                kt_right = 60 / (2 * np.pi * kv_right)
+                
 
                 unique_id = uuid.uuid4().hex[:8]
 
@@ -410,17 +401,7 @@ for coeff_set in coefficient_sets:
                         efficiency_left,
                         efficiency_right,
                         ori_l,
-                        ori_theta,
-                        kv_left,
-                        kv_right,
-                        voltage_left,
-                        voltage_right,
-                        resistance_left,
-                        resistance_right,
-                        kt_left,
-                        kt_right,
-                        gear_left_ratio,
-                        gear_right_ratio
+                        ori_theta
                     )
 
                     if result is None :
