@@ -44,7 +44,17 @@ for coeff_set in coefficient_sets:
         date_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         
         # Update filenames to include coefficient values
-        output_dir = os.path.join(RESULTS_DIR, "CMAES_output", "Case_C_Full_co_design")
+        dynamic_root = os.path.join(RESULTS_DIR, "dynamic_vel_limits")
+        dynamic_subfolders = [
+            "Case_A_ll",
+            "Case_B_act",
+            "Case_C_Full_co_design",
+            "baseline",
+        ]
+        for subfolder in dynamic_subfolders:
+            os.makedirs(os.path.join(dynamic_root, subfolder), exist_ok=True)
+
+        output_dir = os.path.join(dynamic_root, "Case_C_Full_co_design")
         best_results_file = os.path.join(
             output_dir,
             f"best_dist_20_{coeff_str}_{date_str}_{seed}.csv",
@@ -276,6 +286,23 @@ for coeff_set in coefficient_sets:
 
             return tau_cont
 
+        def get_motor_electrical_params(json_path, motor_name):
+            with open(json_path, "r") as f:
+                data = json.load(f)
+
+            motors = data["Motors"]
+
+            if motor_name not in motors:
+                raise ValueError(f"Motor {motor_name} not found in JSON")
+
+            motor = motors[motor_name]
+
+            kv = motor["Kv"]
+            rated_voltage = motor["ratedVoltage"]
+            resistance = motor["Resistance"]
+
+            return kv, rated_voltage, resistance
+
 
 
 
@@ -324,19 +351,32 @@ for coeff_set in coefficient_sets:
                     gear_right_ratio
                 )
 
+                config_path = os.path.join(ACT_OPT_DIR, "config_files", "config.json")
                 tau_left = get_continuous_torque(
-                    os.path.join(ACT_OPT_DIR, "config_files", "config.json"),
+                    config_path,
                     "Motor" + motor_left_name + "_framed"
                 ) * gear_left_ratio
 
                 tau_right = get_continuous_torque(
-                    os.path.join(ACT_OPT_DIR, "config_files", "config.json"),
+                    config_path,
                     "Motor" + motor_right_name + "_framed"
                 ) * gear_right_ratio
+
+                kv_left, voltage_left, resistance_left = get_motor_electrical_params(
+                    config_path,
+                    "Motor" + motor_left_name + "_framed"
+                )
+                kv_right, voltage_right, resistance_right = get_motor_electrical_params(
+                    config_path,
+                    "Motor" + motor_right_name + "_framed"
+                )
+                kt_left = 60 / (2 * np.pi * kv_left)
+                kt_right = 60 / (2 * np.pi * kv_right)
 
                 unique_id = uuid.uuid4().hex[:8]
 
                 modified_xml = os.path.join(XMLS_DIR, "design_xmls", f"{unique_id}.xml")
+                os.makedirs(os.path.dirname(modified_xml), exist_ok=True)
 
                 modify_5bar_xml(
                     xml_template,
@@ -370,7 +410,17 @@ for coeff_set in coefficient_sets:
                         efficiency_left,
                         efficiency_right,
                         ori_l,
-                        ori_theta
+                        ori_theta,
+                        kv_left,
+                        kv_right,
+                        voltage_left,
+                        voltage_right,
+                        resistance_left,
+                        resistance_right,
+                        kt_left,
+                        kt_right,
+                        gear_left_ratio,
+                        gear_right_ratio
                     )
 
                     if result is None :
