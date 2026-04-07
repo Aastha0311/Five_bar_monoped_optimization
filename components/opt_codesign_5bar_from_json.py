@@ -392,7 +392,7 @@ motor_right_name = get_field(secondary, "Hip right motor", "motor_right_name", "
 gear_left_ratio = float(get_field(secondary, "Hip left ratio", "gear_left_ratio", "gear_ratio_left"))
 gear_right_ratio = float(get_field(secondary, "Hip right ratio", "gear_right_ratio", "gear_ratio_right"))
 
-config_path = os.path.join(REPO_DIR, "Actuator Optimization", "config_files", "config.json")
+config_path = os.path.join(REPO_DIR, "actuator_optimization", "config_files", "config.json")
 motor_left_key = f"Motor{motor_left_name}_framed"
 motor_right_key = f"Motor{motor_right_name}_framed"
 hip1_peak_torque = get_motor_continuous_torque(config_path, motor_left_key) * gear_left_ratio

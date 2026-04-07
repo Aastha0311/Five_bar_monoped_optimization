@@ -19,7 +19,7 @@ REPO_DIR = os.path.abspath(os.path.join(BASE_DIR, ".."))
 RESULTS_DIR = os.path.join(REPO_DIR, "results")
 XMLS_DIR = os.path.join(REPO_DIR, "xmls")
 COMPONENTS_DIR = os.path.join(REPO_DIR, "components")
-ACT_OPT_DIR = os.path.join(REPO_DIR, "Actuator Optimization")
+ACT_OPT_DIR = os.path.join(REPO_DIR, "actuator_optimization")
 # Define the coefficient sets
 coefficient_sets = []
 for first_coeff in np.arange(0.55, 0.60, 0.05):  # 0.4 to 0.8 with step 0.05
