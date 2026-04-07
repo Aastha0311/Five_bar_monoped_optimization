@@ -16,7 +16,7 @@ MOTORS = [
 ]
 
 GR_MIN = 4
-GR_MAX = 60
+GR_MAX = 35
 STEP = 0.1
 
 target_ratios = np.round(np.arange(GR_MIN, GR_MAX + STEP, STEP), 1)
